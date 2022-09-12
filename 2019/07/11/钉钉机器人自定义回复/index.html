@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>python钉钉机器人自定义回复 | 梁友泽的博客</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="大概有这样的需求  达到xxx条件。比如是到了某个时刻。机器人自动在群里通知，并@相关的人 比如在群里回复一个关键词、然后期望得到想要的信息，以达到解放双手的目的。这一块儿就需要自己对接钉钉API来实现了。比如这种问答式的">
+<meta name="keywords" content="Python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python钉钉机器人自定义回复">
+<meta property="og:url" content="https://www.liangyouze.com/2019/07/11/钉钉机器人自定义回复/index.html">
+<meta property="og:site_name" content="梁友泽的博客">
+<meta property="og:description" content="大概有这样的需求  达到xxx条件。比如是到了某个时刻。机器人自动在群里通知，并@相关的人 比如在群里回复一个关键词、然后期望得到想要的信息，以达到解放双手的目的。这一块儿就需要自己对接钉钉API来实现了。比如这种问答式的">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2022/png/203997/1662960636733-f191bc74-d9a5-401a-87f7-ee9ac831b176.png#clientId=u3ae97c87-dc62-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=409&id=uf767a516&margin=%5Bobject%20Object%5D&name=image.png&originHeight=409&originWidth=741&originalType=binary&ratio=1&rotation=0&showTitle=false&size=120711&status=done&style=none&taskId=u033c41b3-d2bf-4896-8035-e3627544ae3&title=&width=741">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2022/png/203997/1662968122191-2559e018-3509-41d7-a932-2df3363c2beb.png#clientId=u3ae97c87-dc62-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=809&id=u7265d29c&margin=%5Bobject%20Object%5D&name=image.png&originHeight=964&originWidth=1616&originalType=binary&ratio=1&rotation=0&showTitle=false&size=116093&status=done&style=none&taskId=u84c1e1b2-83ee-4f7f-9067-8ea08b48839&title=&width=1356">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2022/png/203997/1662961831865-c0716002-c7bd-42d5-b2eb-b4bde29cf0ae.png#clientId=u3ae97c87-dc62-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=400&id=u2ef7eaf4&margin=%5Bobject%20Object%5D&name=image.png&originHeight=400&originWidth=484&originalType=binary&ratio=1&rotation=0&showTitle=false&size=30724&status=done&style=none&taskId=u6508e483-30d7-427e-9bda-79cd126d56a&title=&width=484">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2022/png/203997/1662961861547-6719f0b6-449a-44e6-96d9-dfb424fd1d2c.png#clientId=u3ae97c87-dc62-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=307&id=ua65b73b3&margin=%5Bobject%20Object%5D&name=image.png&originHeight=307&originWidth=671&originalType=binary&ratio=1&rotation=0&showTitle=false&size=37036&status=done&style=none&taskId=uc1c9b893-bbfd-422f-9bec-61bcb58c7e4&title=&width=671">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2022/png/203997/1662961920204-57414a57-423b-44ae-ae4e-ae7ae6c8cd69.png#clientId=u3ae97c87-dc62-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=284&id=u3649e32f&margin=%5Bobject%20Object%5D&name=image.png&originHeight=284&originWidth=611&originalType=binary&ratio=1&rotation=0&showTitle=false&size=16239&status=done&style=none&taskId=ua2da9c01-62e5-4cfb-b11c-7565112e582&title=&width=611">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2022/png/203997/1662962228534-bc05a3c6-fb45-4209-b82e-3f684e2038b6.png#clientId=u3ae97c87-dc62-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=155&id=u5bf3bb14&margin=%5Bobject%20Object%5D&name=image.png&originHeight=155&originWidth=596&originalType=binary&ratio=1&rotation=0&showTitle=false&size=8903&status=done&style=none&taskId=ua53c60fd-75ad-4a1b-84f7-f3fd7a11696&title=&width=596">
+<meta property="og:updated_time" content="2022-09-12T09:19:33.493Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python钉钉机器人自定义回复">
+<meta name="twitter:description" content="大概有这样的需求  达到xxx条件。比如是到了某个时刻。机器人自动在群里通知，并@相关的人 比如在群里回复一个关键词、然后期望得到想要的信息，以达到解放双手的目的。这一块儿就需要自己对接钉钉API来实现了。比如这种问答式的">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2022/png/203997/1662960636733-f191bc74-d9a5-401a-87f7-ee9ac831b176.png#clientId=u3ae97c87-dc62-4&crop=0&crop=0&crop=1&crop=1&from=paste&height=409&id=uf767a516&margin=%5Bobject%20Object%5D&name=image.png&originHeight=409&originWidth=741&originalType=binary&ratio=1&rotation=0&showTitle=false&size=120711&status=done&style=none&taskId=u033c41b3-d2bf-4896-8035-e3627544ae3&title=&width=741">
+    
+
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+</head>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">梁友泽的博客</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives/">分类</a>
+                
+                    <a class="main-nav-link" href="/categories/">归档</a>
+                
+                    <a class="main-nav-link" href="/about">关于</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/rolle.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives/">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories/">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile" class="profile-fixed">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/rolle.png" />
+            <h2 id="name">梁友泽</h2>
+            <h3 id="title">Developer</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>BeiJing, China</span>
+            <a id="follow" target="_blank" href="https://github.com/youzeliang">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                22
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                16
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/youzeliang" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/i@liangyouze.com" target="_blank" title="email" class=tooltip>
+                            <i class="fa fa-email"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/css/images/rolle_wechat.jpg" target="_blank" title="wechat" class=tooltip>
+                            <i class="fa fa-wechat"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-钉钉机器人自定义回复" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            python钉钉机器人自定义回复
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2019/07/11/钉钉机器人自定义回复/">
+            <time datetime="2019-07-11T06:10:23.000Z" itemprop="datePublished">2019-07-11</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/Python/">Python</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/Python/">Python</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>大概有这样的需求</p>
+<ol>
+<li>达到xxx条件。比如是到了某个时刻。机器人自动在群里通知，并@相关的人</li>
+<li>比如在群里回复一个关键词、然后期望得到想要的信息，以达到解放双手的目的。这一块儿就需要自己对接钉钉API来实现了。比如这种问答式的<a id="more"></a></li>
+</ol>
+<p><img src="https://cdn.nlark.com/yuque/0/2022/png/203997/1662960636733-f191bc74-d9a5-401a-87f7-ee9ac831b176.png#clientId=u3ae97c87-dc62-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=409&amp;id=uf767a516&amp;margin=%5Bobject%20Object%5D&amp;name=image.png&amp;originHeight=409&amp;originWidth=741&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=120711&amp;status=done&amp;style=none&amp;taskId=u033c41b3-d2bf-4896-8035-e3627544ae3&amp;title=&amp;width=741" alt="image.png"></p>
+<p>明白这样的需求后就去 <a href="https://open.dingtalk.com/document/group/enterprise-created-chatbot" target="_blank" rel="noopener">官网</a> 找文档去了。</p>
+<p>其实官网文档说的很清楚了。没啥需要补充的。</p>
+<p><a name="glhRr"></a></p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><ul>
+<li>需要部署到服务器</li>
+<li>除了定时还需要自定义回复</li>
+<li>不需要性能太高，简单便捷就好。所以在go和Python之间选择了Python</li>
+</ul>
+<p>使用Flash启动</p>
+<p>主要逻辑代码<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</span><br><span class="line"> </span><br><span class="line"><span class="comment"># http://flask.pocoo.org/docs/0.12/api/#flask.Flask</span></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line"><span class="meta">@app.route('/HelloWorld')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello_world</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"Hello World!"</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    <span class="comment"># http://flask.pocoo.org/docs/0.12/quickstart/#a-minimal-application</span></span><br><span class="line">    app.run(host=<span class="string">'0.0.0.0'</span>, port=<span class="string">'5000'</span>)</span><br></pre></td></tr></table></figure></p>
+<p>用python开启flask web服务时，</p>
+<ul>
+<li>你只需要本机访问，那ip只要不设置为0.0.0.0就可以，正常访问就好</li>
+<li>如果你需要外网访问，ip需要设置为0.0.0.0，此时，在本机上访问需要使用默认的127.0.0.1（也就是你不设置ip时默认的ip）,在外网上访问则需要使用你本机的ip，不要使用0.0.0.0</li>
+</ul>
+<p>也可以这样的方式来启动</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">if __name__ == "__main__":</span><br><span class="line">    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</span><br><span class="line">    server_socket.bind(("", 8083))</span><br><span class="line">    server_socket.listen(120)</span><br><span class="line">    while True:</span><br><span class="line">        client_socket, client_address = server_socket.accept()</span><br><span class="line">        handle_client_process = Process(target=handle_client, args=(client_socket,))</span><br><span class="line">        handle_client_process.start()</span><br><span class="line">        client_socket.close()</span><br></pre></td></tr></table></figure>
+<p>然后去实现handle_client 就好了。篇幅有限。完整的代码关注公众号  罗尔街 即可获取<br><a name="Lmbni"></a></p>
+<h3 id="架构图"><a href="#架构图" class="headerlink" title="架构图"></a>架构图</h3><p><img src="https://cdn.nlark.com/yuque/0/2022/png/203997/1662968122191-2559e018-3509-41d7-a932-2df3363c2beb.png#clientId=u3ae97c87-dc62-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=809&amp;id=u7265d29c&amp;margin=%5Bobject%20Object%5D&amp;name=image.png&amp;originHeight=964&amp;originWidth=1616&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=116093&amp;status=done&amp;style=none&amp;taskId=u84c1e1b2-83ee-4f7f-9067-8ea08b48839&amp;title=&amp;width=1356" alt="image.png"></p>
+<p>流程</p>
+<ul>
+<li>用户通过django admin来添加消息配置，即关键字与回复内容。</li>
+<li>用户通过钉钉企业内部群中@机器人 + 关键字。</li>
+<li>企业机器人收到后，由socket监听服务接收，并根据消息类型进行处理后返回。</li>
+<li>企业机器人收到返回的消息后，通过内网穿透工具给的外网映射地址进行回复。</li>
+<li>企业内部群显示回复的消息，用户看见回复的消息。</li>
+</ul>
+<p><a name="o5jjZ"></a></p>
+<h3 id="实践"><a href="#实践" class="headerlink" title="实践"></a>实践</h3><p><a name="iyWZB"></a></p>
+<h4 id="针对定时、或者达到xxx条件触发的，在智能群助手里面添加机器人就好了"><a href="#针对定时、或者达到xxx条件触发的，在智能群助手里面添加机器人就好了" class="headerlink" title="针对定时、或者达到xxx条件触发的，在智能群助手里面添加机器人就好了"></a>针对定时、或者达到xxx条件触发的，在智能群助手里面添加机器人就好了</h4><p><img src="https://cdn.nlark.com/yuque/0/2022/png/203997/1662961831865-c0716002-c7bd-42d5-b2eb-b4bde29cf0ae.png#clientId=u3ae97c87-dc62-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=400&amp;id=u2ef7eaf4&amp;margin=%5Bobject%20Object%5D&amp;name=image.png&amp;originHeight=400&amp;originWidth=484&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=30724&amp;status=done&amp;style=none&amp;taskId=u6508e483-30d7-427e-9bda-79cd126d56a&amp;title=&amp;width=484" alt="image.png"></p>
+<p>选择 自定义机器人<br><img src="https://cdn.nlark.com/yuque/0/2022/png/203997/1662961861547-6719f0b6-449a-44e6-96d9-dfb424fd1d2c.png#clientId=u3ae97c87-dc62-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=307&amp;id=ua65b73b3&amp;margin=%5Bobject%20Object%5D&amp;name=image.png&amp;originHeight=307&amp;originWidth=671&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=37036&amp;status=done&amp;style=none&amp;taskId=uc1c9b893-bbfd-422f-9bec-61bcb58c7e4&amp;title=&amp;width=671" alt="image.png"></p>
+<p>然后配置其中一种安全方式即可 </p>
+<p><img src="https://cdn.nlark.com/yuque/0/2022/png/203997/1662961920204-57414a57-423b-44ae-ae4e-ae7ae6c8cd69.png#clientId=u3ae97c87-dc62-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=284&amp;id=u3649e32f&amp;margin=%5Bobject%20Object%5D&amp;name=image.png&amp;originHeight=284&amp;originWidth=611&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=16239&amp;status=done&amp;style=none&amp;taskId=ua2da9c01-62e5-4cfb-b11c-7565112e582&amp;title=&amp;width=611" alt="image.png"></p>
+<p>得到webhook地址。</p>
+<p>也可以先构建一个curl来测试一下</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl 'https://oapi.dingtalk.com/robot/send?access_token=381c2f405e0f906fd556b27cea9f66864120860b5d8b117bb046e10b6599b050&amp;timestamp=1613211530113&amp;secret=SEC2e67120c5e4affa1177ac25fe8dc77ba1c5b49284a9dc7e1888770bc3b76b1fc' \</span><br><span class="line">   -H 'Content-Type: application/json' \</span><br><span class="line">   -d '&#123;"msgtype": "text","text": &#123;"content": "test"&#125;&#125;'</span><br></pre></td></tr></table></figure>
+<p>主要逻辑代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">import</span> hashlib</span><br><span class="line"><span class="keyword">import</span> hmac</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> urllib</span><br><span class="line"><span class="keyword">import</span> urllib.parse</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sign</span><span class="params">()</span>:</span></span><br><span class="line">    timestamp = str(round(time.time() * <span class="number">1000</span>))</span><br><span class="line">    secret = <span class="string">"SECe5d17dac6060b76c01ea60aec260fe76c6e0644394b932bfffa963342bb630a1"</span></span><br><span class="line">    secret_enc = secret.encode(<span class="string">'utf-8'</span>)</span><br><span class="line">    string_to_sign = <span class="string">'&#123;&#125;\n&#123;&#125;'</span>.format(timestamp, secret)</span><br><span class="line">    string_to_sign_enc = string_to_sign.encode(<span class="string">'utf-8'</span>)</span><br><span class="line">    hmac_code = hmac.new(secret_enc, string_to_sign_enc, digestmod=hashlib.sha256).digest()</span><br><span class="line">    sign_res = urllib.parse.quote_plus(base64.b64encode(hmac_code))</span><br><span class="line">    <span class="keyword">return</span> timestamp, sign_res</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">send_ding_message</span><span class="params">(text_info)</span>:</span></span><br><span class="line">    webhook = <span class="string">"https://oapi.dingtalk.com/robot/send?access_token=f069339ad1fcb9410d0e96fd947d9a2bf3416451d01dc97e3ef4256c1fdb2b7a"</span></span><br><span class="line">    header = &#123;</span><br><span class="line">        <span class="string">"Content-Type"</span>: <span class="string">"application/json"</span>,</span><br><span class="line">        <span class="string">"Charset"</span>: <span class="string">"UTF-8"</span></span><br><span class="line">    &#125;</span><br><span class="line">    text = text_info</span><br><span class="line">    message = &#123;</span><br><span class="line">        <span class="string">"msgtype"</span>: <span class="string">"text"</span>,</span><br><span class="line">        <span class="string">"text"</span>: &#123;</span><br><span class="line">            <span class="string">"content"</span>: text</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">"at"</span>: &#123;</span><br><span class="line">            <span class="comment"># "isAtAll": False</span></span><br><span class="line">            <span class="comment"># "atMobiles": [</span></span><br><span class="line">            <span class="comment">#     "18512345678"</span></span><br><span class="line">            <span class="comment"># ]</span></span><br><span class="line">            <span class="string">"atUserIds"</span>: [</span><br><span class="line">                <span class="string">"lbkgv8q"</span></span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    message_json = json.dumps(message)</span><br><span class="line">    timestamp, sign_res = sign()</span><br><span class="line">    webhook += <span class="string">"&amp;timestamp="</span> + timestamp + <span class="string">"&amp;sign="</span> + sign_res</span><br><span class="line">    info = requests.post(url=webhook, data=message_json, headers=header)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">usage</span><span class="params">()</span>:</span></span><br><span class="line">    send_ding_message(<span class="string">'test 1'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    usage()</span><br></pre></td></tr></table></figure>
+<p>效果<br><img src="https://cdn.nlark.com/yuque/0/2022/png/203997/1662962228534-bc05a3c6-fb45-4209-b82e-3f684e2038b6.png#clientId=u3ae97c87-dc62-4&amp;crop=0&amp;crop=0&amp;crop=1&amp;crop=1&amp;from=paste&amp;height=155&amp;id=u5bf3bb14&amp;margin=%5Bobject%20Object%5D&amp;name=image.png&amp;originHeight=155&amp;originWidth=596&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=8903&amp;status=done&amp;style=none&amp;taskId=ua53c60fd-75ad-4a1b-84f7-f3fd7a11696&amp;title=&amp;width=596" alt="image.png"></p>
+<p><a name="jEoBC"></a></p>
+<h4 id="针对自定义回复消息的"><a href="#针对自定义回复消息的" class="headerlink" title="针对自定义回复消息的"></a>针对自定义回复消息的</h4><p><a href="https://open.dingtalk.com/document/tutorial/create-a-robot" target="_blank" rel="noopener">官方链接</a></p>
+<p>按照链接先添加就好了</p>
+<p>既然是需要钉钉回调我们服务的 ，所以要校验token、sign的合法性</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">timestamp = request.headers.get(<span class="string">'Timestamp'</span>)</span><br><span class="line">sign = request.headers.get(<span class="string">'Sign'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> sign(timestamp) == sign:</span><br></pre></td></tr></table></figure>
+<p>生成规则，官方给了示例<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sign</span><span class="params">()</span>:</span></span><br><span class="line">    timestamp = str(round(time.time() * <span class="number">1000</span>))</span><br><span class="line">    secret = <span class="string">"SECe5d17dac6060b76c01ea60aec260fe76c6e0644394b932bfffa963342bb630a1"</span></span><br><span class="line">    secret_enc = secret.encode(<span class="string">'utf-8'</span>)</span><br><span class="line">    string_to_sign = <span class="string">'&#123;&#125;\n&#123;&#125;'</span>.format(timestamp, secret)</span><br><span class="line">    string_to_sign_enc = string_to_sign.encode(<span class="string">'utf-8'</span>)</span><br><span class="line">    hmac_code = hmac.new(secret_enc, string_to_sign_enc, digestmod=hashlib.sha256).digest()</span><br><span class="line">    sign_res = urllib.parse.quote_plus(base64.b64encode(hmac_code))</span><br><span class="line">    <span class="keyword">return</span> timestamp, sign_res</span><br></pre></td></tr></table></figure></p>
+<p>当然也可以用ip段来做安全的校验</p>
+<p>如果是企业内部网络、并非是公网，则需要用内网穿透。官方也给了示例，这里就不再重复了。</p>
+<p><a name="RqCqz"></a></p>
+<h4 id="一些可能会遇到的坑"><a href="#一些可能会遇到的坑" class="headerlink" title="一些可能会遇到的坑"></a>一些可能会遇到的坑</h4><ol>
+<li>在使用Python的Flask时、报错  “POST / HTTP/1.1” 405 -  可能是没有允许请求本身的方法<ul>
+<li>解决方法: 添加method</li>
+<li>@app.route(‘/‘, methods=[‘GET’, ‘POST’])</li>
+</ul>
+</li>
+<li>钉钉机器人的webhook是固定的、如果是多个群想用同一个机器人、则需要用app_secret来解决</li>
+<li><br></li>
+</ol>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://www.liangyouze.com/2019/07/11/钉钉机器人自定义回复/" data-id="cl7yklnxm001rfeu33vey5561" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="https://www.liangyouze.com/2019/07/11/钉钉机器人自定义回复/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="https://www.liangyouze.com/2019/07/11/钉钉机器人自定义回复/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2019/09/11/MySQL死锁/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    记一次MySQL死锁排查过程
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2019/06/04/[译]合适以及为何使用最少使用(LFU)缓存与Golang中的实现/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">合适以及为何使用最少使用(LFU)缓存与Golang中的实现</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2021/01/01/2020年总结/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/杂谈/">杂谈</a></p>
+                            <p class="item-title"><a href="/2021/01/01/2020年总结/" class="title">2020年总结</a></p>
+                            <p class="item-date"><time datetime="2021-01-01T09:10:23.000Z" itemprop="datePublished">2021-01-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2020/08/11/内存对齐/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/golang/">golang</a></p>
+                            <p class="item-title"><a href="/2020/08/11/内存对齐/" class="title">内存对齐</a></p>
+                            <p class="item-date"><time datetime="2020-08-11T06:10:23.000Z" itemprop="datePublished">2020-08-11</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2020/07/11/go-map/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/map/">map</a></p>
+                            <p class="item-title"><a href="/2020/07/11/go-map/" class="title">深入理解go map</a></p>
+                            <p class="item-date"><time datetime="2020-07-11T06:10:23.000Z" itemprop="datePublished">2020-07-11</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2020/03/11/golang切片/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/golang/">golang</a></p>
+                            <p class="item-title"><a href="/2020/03/11/golang切片/" class="title">golang 切片</a></p>
+                            <p class="item-date"><time datetime="2020-03-11T07:10:23.000Z" itemprop="datePublished">2020-03-11</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2020/02/11/给字符串加索引/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/mysql/">mysql</a></p>
+                            <p class="item-title"><a href="/2020/02/11/给字符串加索引/" class="title">给字符串加索引</a></p>
+                            <p class="item-date"><time datetime="2020-02-11T06:10:23.000Z" itemprop="datePublished">2020-02-11</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL/">MySQL</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/map/">map</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/vim/">vim</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/杂谈/">杂谈</a><span class="category-list-count">3</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">January 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/">MySQL</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/">golang</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iframe/">iframe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存对齐/">内存对齐</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/字符串/">字符串</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/索引/">索引</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/规则/">规则</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/订单号/">订单号</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/跨域/">跨域</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/MySQL/" style="font-size: 20px;">MySQL</a> <a href="/tags/Python/" style="font-size: 10px;">Python</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/go/" style="font-size: 10px;">go</a> <a href="/tags/golang/" style="font-size: 16.67px;">golang</a> <a href="/tags/iframe/" style="font-size: 10px;">iframe</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/内存对齐/" style="font-size: 10px;">内存对齐</a> <a href="/tags/字符串/" style="font-size: 13.33px;">字符串</a> <a href="/tags/杂谈/" style="font-size: 16.67px;">杂谈</a> <a href="/tags/索引/" style="font-size: 10px;">索引</a> <a href="/tags/规则/" style="font-size: 10px;">规则</a> <a href="/tags/订单号/" style="font-size: 10px;">订单号</a> <a href="/tags/读书/" style="font-size: 10px;">读书</a> <a href="/tags/跨域/" style="font-size: 10px;">跨域</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://www.liangyongrui.com">梁永锐</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+			<!--不蒜子统计-->
+           <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <span id="busuanzi_container_site_pv">本站总访问量:<span id="busuanzi_value_site_pv"></span>&nbsp;本站总访次数:<span id="busuanzi_value_site_uv"></span></span><br>
+		
+            &copy; 2022 梁友泽<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script>
+    var disqus_config = function () {
+        
+            this.page.url = 'https://www.liangyouze.com/2019/07/11/钉钉机器人自定义回复/';
+        
+        this.page.identifier = '钉钉机器人自定义回复';
+    };
+    (function() { 
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'hexo-theme-icarus' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>
