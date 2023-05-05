@@ -3,20 +3,20 @@
 <head>
     <meta charset="utf-8">
     
-    <title>记一次MySQL死锁排查过程 | 梁友泽的博客</title>
+    <title>高阶函数编程技巧 | 梁友泽的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="背景大概说一下业务场景，需要定时计算一些数据，从其他系统、接口拉取达到的数据比较多，然后经计算后的值存储在本系统中。拉取的数据量可能有万左右，然后以主键存在的数据是需要更新的。不存在则插入。每次做全量更新/插入。">
-<meta name="keywords" content="MySQL">
+    <meta name="description" content="函数是 Go 语言的一等公民，如何利用好其高级用法特性，是一件值得思考和实践的事情">
+<meta name="keywords" content="go">
 <meta property="og:type" content="article">
-<meta property="og:title" content="记一次MySQL死锁排查过程">
-<meta property="og:url" content="https://www.liangyouze.com/2019/09/11/MySQL死锁/index.html">
+<meta property="og:title" content="高阶函数编程技巧">
+<meta property="og:url" content="https://www.liangyouze.com/2023/05/05/高阶函数编程技巧/index.html">
 <meta property="og:site_name" content="梁友泽的博客">
-<meta property="og:description" content="背景大概说一下业务场景，需要定时计算一些数据，从其他系统、接口拉取达到的数据比较多，然后经计算后的值存储在本系统中。拉取的数据量可能有万左右，然后以主键存在的数据是需要更新的。不存在则插入。每次做全量更新/插入。">
+<meta property="og:description" content="函数是 Go 语言的一等公民，如何利用好其高级用法特性，是一件值得思考和实践的事情">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-10-13T08:36:36.268Z">
+<meta property="og:updated_time" content="2023-05-05T12:23:15.943Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="记一次MySQL死锁排查过程">
-<meta name="twitter:description" content="背景大概说一下业务场景，需要定时计算一些数据，从其他系统、接口拉取达到的数据比较多，然后经计算后的值存储在本系统中。拉取的数据量可能有万左右，然后以主键存在的数据是需要更新的。不存在则插入。每次做全量更新/插入。">
+<meta name="twitter:title" content="高阶函数编程技巧">
+<meta name="twitter:description" content="函数是 Go 语言的一等公民，如何利用好其高级用法特性，是一件值得思考和实践的事情">
     
 
     
@@ -196,7 +196,7 @@
 </aside>
 
             
-            <section id="main"><article id="post-MySQL死锁" class="article article-type-post" itemscope itemprop="blogPost">
+            <section id="main"><article id="post-高阶函数编程技巧" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -204,7 +204,7 @@
                 
     
         <h1 class="article-title" itemprop="name">
-            记一次MySQL死锁排查过程
+            高阶函数编程技巧
         </h1>
     
 
@@ -213,8 +213,8 @@
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2019/09/11/MySQL死锁/">
-            <time datetime="2019-09-11T06:10:23.000Z" itemprop="datePublished">2019-09-11</time>
+        <a href="/2023/05/05/高阶函数编程技巧/">
+            <time datetime="2023-05-05T11:50:23.000Z" itemprop="datePublished">2023-05-05</time>
         </a>
     </div>
 
@@ -222,13 +222,13 @@
                         
     <div class="article-category">
     	<i class="fa fa-folder"></i>
-        <a class="article-category-link" href="/categories/MySQL/">MySQL</a>
+        <a class="article-category-link" href="/categories/函数/">函数</a>
     </div>
 
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/MySQL/">MySQL</a>
+        <a class="tag-link" href="/tags/go/">go</a>
     </div>
 
                     </div>
@@ -239,12 +239,38 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>大概说一下业务场景，需要定时计算一些数据，从其他系统、接口拉取达到的数据比较多，然后经计算后的值存储在本系统中。拉取的数据量可能有万左右，然后以主键存在的数据是需要更新的。不存在则插入。每次做全量更新/插入。<a id="more"></a></p>
-<h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>最开始采用的方法是先查询，数据存在则更新数据，不存在则插入数据。但是数据要求的时效性比较高。于是定时任务在做任务处理的时候频率就比较高了。就出现了单位时间内对数据库的读写高，于是就换了一个方法。用INSERT … ON DUPLICATE KEY UPDATE。</p>
-<p>对数据库的读写次数虽然比之前少了，但是又引发了一个新的问题，因为更新、插入的数据量多，所以导致与一条INSERT … ON DUPLICATE KEY UPDATE的执行时间有点长，大概5s，去研究了下。实际上一次批量插入几千条条数据。为了解决这个问题，就分组批量查询，分为了每 50 条数据一组，这样每条sql 执行的时间也就短了。</p>
-<p>随之又出现了另外一个问题，随着数据量的增加，一次循环拉取的数据经计算,写入,更新等。时间大于定时任务所处理的时间，这样就导致与上一个定时任务还没处理完的时候，下一个定时任务又进来处理数据了。</p>
-<p>于是选择的做法是在每处理一组数据的时候，把 redis 的key 延长一点时间。然后整组数据处理完的时候，再删除 redis 的 值。等下一次定时任务抢到锁了再进来处理。</p>
-<p>想到的第二个方案是，直接插入数据库，主键冲突就抛错，根据指定的错来更新值</p>
+            <p>函数是 Go 语言的一等公民，如何利用好其高级用法特性，是一件值得思考和实践的事情<a id="more"></a></p>
+<p><a name="K0cFk"></a></p>
+<h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>在日常业务开发中，对于一些表的不同字段做筛选查询，是基础的功能。而且大部分可能是在根据不同条件去查询。就像这样<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> XXXRepo <span class="keyword">interface</span> &#123;</span><br><span class="line">	GetXXXByIdOrName(ctx context.Context, id <span class="keyword">int</span>, name <span class="keyword">string</span>) (o []admin.XXX, err error)</span><br><span class="line">	GetXXXInfoList(ctx context.Context, req *GetXXXRequest) (total <span class="keyword">int64</span>, o []admin.XXX, err error)</span><br><span class="line">	GetXXXInfo(ctx context.Context, columnId, gradeId <span class="keyword">int</span>) (o []admin.XXX, err error)</span><br><span class="line">	GetXXXByIdList(ctx context.Context, idList []<span class="keyword">int</span>) (o []admin.XXX, err error)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这也还只是少许的一些条件，如果一张表有十多个字段配合查询呢 ？ dao层也会有非常多的冗余代码，可能也就改变了一下入参而已。</p>
+<p>假设有一张订单表，简化结构如下<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE <span class="string">`order`</span> (</span><br><span class="line">  <span class="string">`id`</span> bigint unsigned NOT NULL AUTO_INCREMENT COMMENT <span class="string">'自增主键'</span>,</span><br><span class="line">  <span class="string">`order_id`</span> bigint NOT NULL COMMENT <span class="string">'订单id'</span>,</span><br><span class="line">  <span class="string">`shop_id`</span> varchar NOT NULL COMMENT <span class="string">'店铺id'</span>,</span><br><span class="line">  <span class="string">`product_id`</span> <span class="keyword">int</span> NOT NULL DEFAULT <span class="string">'0'</span> COMMENT <span class="string">'商品id'</span>,</span><br><span class="line">  <span class="string">`status`</span> <span class="keyword">int</span> NOT NULL DEFAULT <span class="string">'0'</span> COMMENT <span class="string">'状态'</span>,</span><br><span class="line">  PRIMARY KEY (<span class="string">`id`</span>),</span><br><span class="line">) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT=<span class="string">'订单表'</span>;</span><br></pre></td></tr></table></figure></p>
+<p>举例说明用以下这些字段的不同组合来查询<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">order_id, shop_id, produce_id,status</span><br></pre></td></tr></table></figure></p>
+<p>会在dao层来编写类似于这样的代码</p>
+<p>根据orderId来查询<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetOrderInfoByOrderId</span><span class="params">(ctx context.Context, orderId <span class="keyword">int64</span>)</span> <span class="params">([]*resource.Order)</span></span> &#123;</span><br><span class="line">   db := GetDB(ctx)</span><br><span class="line">   db = db.Table(resource.Order&#123;&#125;.TableName())</span><br><span class="line">   <span class="keyword">var</span> infos []*resource.Order</span><br><span class="line">   db = db.Where(<span class="string">"order_id = ?"</span>, orderId)</span><br><span class="line">   db.Find(&amp;infos)</span><br><span class="line">   <span class="keyword">return</span> infos</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>根据shopId来查询<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetOrderInfoByShopId</span><span class="params">(ctx context.Context, shopId <span class="keyword">int64</span>)</span> <span class="params">([]*resource.Order)</span></span> &#123;</span><br><span class="line">   db := GetDB(ctx)</span><br><span class="line">   db = db.Table(resource.Order&#123;&#125;.TableName())</span><br><span class="line">   <span class="keyword">var</span> infos []*resource.Order</span><br><span class="line">   db = db.Where(<span class="string">"shop_id = ?"</span>, shopId)</span><br><span class="line">   db.Find(&amp;infos)</span><br><span class="line">   <span class="keyword">return</span> infos</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以看到，两个方法的代码<strong>极度相似</strong>，除了入参和命名不一样，如果再需要按照 produce_id 或者 status 查询，那需要再写几个类似的方法，导致相似的方法非常多。当然很容易想到，如果参数是传多个，传多个不就好了，可能就是这样的写法<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetOrderInfo</span><span class="params">(ctx context.Context,orderId, shopId <span class="keyword">int64</span>)</span> <span class="params">([]*resource.Order)</span></span> &#123;</span><br><span class="line">   db := GetDB(ctx)</span><br><span class="line">   db = db.Table(resource.Order&#123;&#125;.TableName())</span><br><span class="line">   <span class="keyword">var</span> infos []*resource.Order</span><br><span class="line">   db = db.Where(<span class="string">"shop_id = ? and order_id = ?"</span>, shopId,orderId)</span><br><span class="line">   db.Find(&amp;infos)</span><br><span class="line">   <span class="keyword">return</span> infos</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果什么时候业务有变化，需要改条件。也许就会变为这样<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetOrderInfo</span><span class="params">(ctx context.Context,orderId, shopId <span class="keyword">int64</span>)</span> <span class="params">([]*resource.Order)</span></span> &#123;</span><br><span class="line">   db := GetDB(ctx)</span><br><span class="line">   db = db.Table(resource.Order&#123;&#125;.TableName())</span><br><span class="line">   <span class="keyword">var</span> infos []*resource.Order</span><br><span class="line">   <span class="keyword">if</span> orderId != <span class="number">0</span> &#123;</span><br><span class="line">       db = db.Where(<span class="string">"order_id = ?"</span>,orderId)</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">if</span> shopId != <span class="number">0</span> &#123;</span><br><span class="line">       db = db.Where(<span class="string">"shop_id = ?"</span>,shopId)</span><br><span class="line">   &#125;</span><br><span class="line">   db.Find(&amp;infos)</span><br><span class="line">   <span class="keyword">return</span> infos</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>调用方的代码大概是这样的<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据shopId 查询</span></span><br><span class="line">infos := GetOrderInfo(ctx, <span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据orderId 查询</span></span><br><span class="line">infos := GetOrderInfo(ctx, <span class="number">1</span>, <span class="number">0</span>)</span><br></pre></td></tr></table></figure></p>
+<p>相当于其他不关心的查询字段用对应类型默认的零值来替换了。</p>
+<p>当然也可以用结构体来作为一个参数<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetOrderInfo</span><span class="params">(ctx context.Context,order Order)</span> <span class="params">([]*resource.Order)</span></span> &#123;</span><br><span class="line">   db := GetDB(ctx)</span><br><span class="line">   db = db.Table(resource.Order&#123;&#125;.TableName())</span><br><span class="line">   db.Where(&amp;order).find(&amp;infos)</span><br><span class="line">   <span class="keyword">return</span> infos</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>但是</strong>估计有的人遇到过这样的坑，那就是如果当字段是int,int64等，有0时，不清楚到底是传入了0，还是没有传值，是区分不了的。因为go语言默认的类型零值。<br>如果是类型的0值也想作为参数来查询，则默认是忽略的，可以<a href="https://gorm.io/zh_CN/docs/query.html" target="_blank" rel="noopener">参考</a></p>
+<p>gorm 官方有这样一句话<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">NOTE When querying with struct, GORM will only query with non-zero fields, that means if your field’s value is 0, '', false or other zero values, it won’t be used to build query conditions, for example:</span><br></pre></td></tr></table></figure></p>
+<p>针对这种情况可以选择转化为map或者像以下这种方式来判断<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetOrderInfoInfo</span><span class="params">(ctx context.Context, o Order)</span> <span class="params">([]*resource.Order)</span></span> &#123;</span><br><span class="line">   db := GetDB(ctx)</span><br><span class="line">   db = db.Table(resource.Order&#123;&#125;.TableName())</span><br><span class="line">   <span class="keyword">var</span> infos []*resource.Order</span><br><span class="line">   <span class="keyword">if</span> o.orderId &gt; <span class="number">0</span> &#123;</span><br><span class="line">      db = db.Where(<span class="string">"order_id = ?"</span>, o.orderId)</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">if</span> o.shopId != <span class="string">""</span> &#123;</span><br><span class="line">      db = db.Where(<span class="string">"shop_id = ?"</span>, o.shop_id)</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">// 后面就先省略了</span></span><br><span class="line">   <span class="keyword">if</span> xxxx</span><br><span class="line">   db.Find(&amp;infos)</span><br><span class="line">   <span class="keyword">return</span> infos</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里还只是简短几个字段，如果是十几个字段来组合查询，则要写非常多if判断。</p>
+<p>基于以上这种所有情况，有必要来优化一下</p>
+<p>可以利用<strong>函数式编程</strong>来优化</p>
+<p>定义如下<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Option <span class="function"><span class="keyword">func</span><span class="params">(*gorm.DB)</span></span></span><br></pre></td></tr></table></figure></p>
+<p>定义 Option 是一个函数，这个函数的入参类型是*gorm.DB，返回值为空。</p>
+<p>然后针对 表中需要筛选查询的字段定义一个函数，赋值</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">OrderID</span><span class="params">(orderID <span class="keyword">int64</span>)</span> <span class="title">Option</span></span> &#123;</span><br><span class="line">   <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(db *gorm.DB)</span></span> &#123;</span><br><span class="line">      db.Where(<span class="string">"`order_id` = ?"</span>, userID)</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ShopID</span><span class="params">(shopID <span class="keyword">int64</span>)</span> <span class="title">Option</span></span> &#123;</span><br><span class="line">   <span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(db *gorm.DB)</span></span> &#123;</span><br><span class="line">      db.Where(<span class="string">"`shop_id` = ?"</span>, shopID)</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>所以需要为可能得字段来创建不同的函数，返回一个Option函数，该函数是把入参赋值给【db *gorm.DB】对象</p>
+<p>所以基于以上，要改写dao层就很方便了。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">GetOrderInfo</span><span class="params">(ctx context.Context, options ...<span class="keyword">func</span>(option *gorm.DB)</span>) <span class="params">([]*resource.OrderInfo)</span></span> &#123;</span><br><span class="line">   db := GetDB(ctx)</span><br><span class="line">   db = db.Table(resource.OrderInfo&#123;&#125;.TableName())</span><br><span class="line">   <span class="keyword">for</span> _, option := <span class="keyword">range</span> options &#123;</span><br><span class="line">      option(db)</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">var</span> infos []*resource.OrderInfo</span><br><span class="line">   db.Find(&amp;infos)</span><br><span class="line">   <span class="keyword">return</span> infos</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样底层的逻辑就不用写很多if判断了，用 for循环来代替</p>
+<p>调用者知道自己需要根据什么参数来查询，则就用上面写好的参数函数来作为入参<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// orderID 查询</span></span><br><span class="line">infos := GetOrderInfo(ctx, OrderID(orderID))</span><br><span class="line"></span><br><span class="line"><span class="comment">// orderID，shopID 组合查询</span></span><br><span class="line">infos := GetOrderInfo(ctx, OrderID(orderID), ShopID(shopID))</span><br></pre></td></tr></table></figure></p>
+<p>当然还根据其他 in 等条件查询，再写一个函数即可</p>
+<p>经过优化之后，简化了逻辑。相当于配置类的Option就生成了，代码优雅了不少。这里只提到了查询，更新也是类似的道理，删除和写入就没太大必要这样了。</p>
+<p>参考<br><a href="https://commandcenter.blogspot.com/2014/01/self-referential-functions-and-design.html" target="_blank" rel="noopener">Self-referential functions and the design of options</a></p>
 
         
         </div>
@@ -255,7 +281,7 @@
 
 </div>
 
-    <a data-url="https://www.liangyouze.com/2019/09/11/MySQL死锁/" data-id="clhaj1vl4000awru3zo2hkvdj" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="https://www.liangyouze.com/2023/05/05/高阶函数编程技巧/" data-id="clhaj1vlr001kwru3nq6a5lba" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -323,7 +349,7 @@
 
             
     
-        <a href="https://www.liangyouze.com/2019/09/11/MySQL死锁/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="https://www.liangyouze.com/2019/09/11/MySQL死锁/">评论</a>
+        <a href="https://www.liangyouze.com/2023/05/05/高阶函数编程技巧/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="https://www.liangyouze.com/2023/05/05/高阶函数编程技巧/">评论</a>
     
 
         </footer>
@@ -332,19 +358,10 @@
         
 <nav id="article-nav">
     
-        <a href="/2019/10/11/分析MySQL中隐式转换导致查询结果错误及索引不可用/" id="article-nav-newer" class="article-nav-link-wrap">
-            <strong class="article-nav-caption">上一篇</strong>
-            <div class="article-nav-title">
-                
-                    分析MySQL中隐式转换导致查询结果错误及索引不可用
-                
-            </div>
-        </a>
     
-    
-        <a href="/2019/07/11/钉钉机器人自定义回复/" id="article-nav-older" class="article-nav-link-wrap">
+        <a href="/2021/01/01/2020年总结/" id="article-nav-older" class="article-nav-link-wrap">
             <strong class="article-nav-caption">下一篇</strong>
-            <div class="article-nav-title">python钉钉机器人自定义回复</div>
+            <div class="article-nav-title">2020年总结</div>
         </a>
     
 </nav>
@@ -548,9 +565,9 @@
     <script>
     var disqus_config = function () {
         
-            this.page.url = 'https://www.liangyouze.com/2019/09/11/MySQL死锁/';
+            this.page.url = 'https://www.liangyouze.com/2023/05/05/高阶函数编程技巧/';
         
-        this.page.identifier = 'MySQL死锁';
+        this.page.identifier = '高阶函数编程技巧';
     };
     (function() { 
         var d = document, s = d.createElement('script');  
