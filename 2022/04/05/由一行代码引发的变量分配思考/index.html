@@ -3,20 +3,22 @@
 <head>
     <meta charset="utf-8">
     
-    <title>关于iframe跨域传输 | 梁友泽的博客</title>
+    <title>由一行代码引发的变量分配思考 | 梁友泽的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="至于我为什么想写这篇文章是因为最近在项目中使用到了iframe，是的。生无可恋的又写上了一点js，可能是因为前端的人对单点登录啥的或者是页面跳转以及要和后端的逻辑处理起来不是很熟练吧。各大网站，包括淘宝，京东，这些大网站有很多自己的产品，至于前期是怎么样的不是很清楚，网易云至少是用的iframe。参考了一些博客，至于使用不使用iframe，我觉得能解决问题就好，而且如果考虑的多的话就考虑以后扩展以">
-<meta name="keywords" content="跨域,iframe">
+    <meta name="description" content="整个包都只有一行有效代码，或许是一件值得思考的事情">
+<meta name="keywords" content="go">
 <meta property="og:type" content="article">
-<meta property="og:title" content="关于iframe跨域传输">
-<meta property="og:url" content="https://www.liangyouze.com/2018/07/31/关于iframe跨域传输/index.html">
+<meta property="og:title" content="由一行代码引发的变量分配思考">
+<meta property="og:url" content="https://www.liangyouze.com/2022/04/05/由一行代码引发的变量分配思考/index.html">
 <meta property="og:site_name" content="梁友泽的博客">
-<meta property="og:description" content="至于我为什么想写这篇文章是因为最近在项目中使用到了iframe，是的。生无可恋的又写上了一点js，可能是因为前端的人对单点登录啥的或者是页面跳转以及要和后端的逻辑处理起来不是很熟练吧。各大网站，包括淘宝，京东，这些大网站有很多自己的产品，至于前期是怎么样的不是很清楚，网易云至少是用的iframe。参考了一些博客，至于使用不使用iframe，我觉得能解决问题就好，而且如果考虑的多的话就考虑以后扩展以">
+<meta property="og:description" content="整个包都只有一行有效代码，或许是一件值得思考的事情">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-10-08T05:52:24.000Z">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2023/png/203997/1683652346313-fdbb5e18-8bdb-42c4-8860-dd98f96f2e95.png#averageHue=%23fbfaf9&clientId=u029a16a2-9260-4&from=paste&id=u2456c55b&originHeight=672&originWidth=578&originalType=binary&ratio=2&rotation=0&showTitle=false&size=101452&status=done&style=none&taskId=ubd1a01e9-b1e1-4e61-a922-60548fc2f11&title=">
+<meta property="og:updated_time" content="2023-05-09T17:41:12.705Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="关于iframe跨域传输">
-<meta name="twitter:description" content="至于我为什么想写这篇文章是因为最近在项目中使用到了iframe，是的。生无可恋的又写上了一点js，可能是因为前端的人对单点登录啥的或者是页面跳转以及要和后端的逻辑处理起来不是很熟练吧。各大网站，包括淘宝，京东，这些大网站有很多自己的产品，至于前期是怎么样的不是很清楚，网易云至少是用的iframe。参考了一些博客，至于使用不使用iframe，我觉得能解决问题就好，而且如果考虑的多的话就考虑以后扩展以">
+<meta name="twitter:title" content="由一行代码引发的变量分配思考">
+<meta name="twitter:description" content="整个包都只有一行有效代码，或许是一件值得思考的事情">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2023/png/203997/1683652346313-fdbb5e18-8bdb-42c4-8860-dd98f96f2e95.png#averageHue=%23fbfaf9&clientId=u029a16a2-9260-4&from=paste&id=u2456c55b&originHeight=672&originWidth=578&originalType=binary&ratio=2&rotation=0&showTitle=false&size=101452&status=done&style=none&taskId=ubd1a01e9-b1e1-4e61-a922-60548fc2f11&title=">
     
 
     
@@ -196,7 +198,7 @@
 </aside>
 
             
-            <section id="main"><article id="post-关于iframe跨域传输" class="article article-type-post" itemscope itemprop="blogPost">
+            <section id="main"><article id="post-由一行代码引发的变量分配思考" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -204,7 +206,7 @@
                 
     
         <h1 class="article-title" itemprop="name">
-            关于iframe跨域传输
+            由一行代码引发的变量分配思考
         </h1>
     
 
@@ -213,17 +215,22 @@
                         
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2018/07/31/关于iframe跨域传输/">
-            <time datetime="2018-07-31T12:10:33.000Z" itemprop="datePublished">2018-07-31</time>
+        <a href="/2022/04/05/由一行代码引发的变量分配思考/">
+            <time datetime="2022-04-05T11:50:23.000Z" itemprop="datePublished">2022-04-05</time>
         </a>
     </div>
 
 
                         
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/内存逃逸/">内存逃逸</a>
+    </div>
+
                         
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/iframe/">iframe</a>, <a class="tag-link" href="/tags/跨域/">跨域</a>
+        <a class="tag-link" href="/tags/go/">go</a>
     </div>
 
                     </div>
@@ -234,18 +241,112 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <p>至于我为什么想写这篇文章是因为最近在项目中使用到了iframe，是的。生无可恋的又写上了一点js，可能是因为前端的人对单点登录啥的或者是页面跳转以及要和后端的逻辑<br>处理起来不是很熟练吧。各大网站，包括淘宝，京东，这些大网站有很多自己的产品，至于前期是怎么样的不是很清楚，网易云至少是用的iframe。参考了一些博客，至于使用<br>不使用iframe，我觉得能解决问题就好，而且如果考虑的多的话就考虑以后扩展以及拆分啥的，毕竟前端又不像后端这样。<a id="more"></a></p>
-<p>因为要解决跨域问题。有很多方案，比如说iframe，jsonp(不过只支持get，对于一些铭感信息就不行了)</p>
-<p>原本需求是登录在一个站点，而注册是另外一个站点。因为要实时反馈到iframe子页面，子页面在进行相应。</p>
-<p>而在Windows对象下有个postMessage方法，是解决跨越问题的<br>假设有两个不同源的页面，iframe.html和index.html 其中前者是后者的子页面。<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- index.html --&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">h1</span>&gt;</span>this is index<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">iframe</span> <span class="attr">src</span>=<span class="string">"./iframePage.html"</span> <span class="attr">id</span>=<span class="string">'iframe'</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- iframePage --&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line"></span><br><span class="line">  <span class="tag">&lt;<span class="name">h1</span>&gt;</span>this is iframePage<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>现在这两个是无法通信的，因为是不同的站点，所以这个时候就要用到postMessage</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// idnex.html</span><br><span class="line"></span><br><span class="line">//获取iframe元素,当然也可以使用其他的js框架</span><br><span class="line">iFrame = document.getElementById('iframe')</span><br><span class="line"></span><br><span class="line">//iframe加载完毕后再发送消息，否则子页面接收不到message</span><br><span class="line">iFrame.onload = function()&#123;</span><br><span class="line"></span><br><span class="line">  //iframe加载完立即发送一条消息</span><br><span class="line">  iFrame.contentWindow.postMessage('MessageFromIndex1','*');</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>我们知道postMessage是挂载在window对象上的，所以等iframe加载完毕后，用iFrame.contentWindow获取到iframe的window对象，<br>然后调用postMessage方法，相当于给子页面发送了一条消息。</p>
-<p>postMessage方法第二个参数可以设置要发送到哪个url，如果当前子页面的url和设置的不一致，则会发送失败，因为没啥限制就设置为*，代表所有url都允许发送。</p>
-<p>消息发送到iframePage.html，我们来接收message</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// iframePage.html</span><br><span class="line"></span><br><span class="line">//回调函数</span><br><span class="line">function receiveMessageFromIndex ( event ) &#123;</span><br><span class="line">  console.log( 'receiveMessageFromIndex', event )</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//监听message事件</span><br><span class="line">window.addEventListener("message", receiveMessageFromIndex, false);</span><br></pre></td></tr></table></figure>
-<p>然后设置好回调函数，就可以了，data中或许还有其他的数值，所以在接受的时候判断一下。</p>
+            <p>整个包都只有一行有效代码，或许是一件值得思考的事情<a id="more"></a></p>
+<p>闲逛GitHub的时候发现 Brad Fitzpatrick的<a href="https://github.com/bradfitz/iter" target="_blank" rel="noopener">iter</a>包。仔细看了2遍。代码里确实只有一行有效代码<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">N</span><span class="params">(n <span class="keyword">int</span>)</span> []<span class="title">struct</span></span>&#123;&#125; &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="built_in">make</span>([]<span class="keyword">struct</span>&#123;&#125;, n)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>刚开始也是一扫而过，然后看了看注释<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">It does not cause any allocations.</span><br></pre></td></tr></table></figure></p>
+<p>既然有这么多star还有几乎没提issue，我首先假定了他的注释是对的。立马想到空结构体 struct{}  是不占据空间的，典型的在写代码的时候，会经常这么写来判断某些值是否在之前出现过</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">m := <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">struct</span>&#123;&#125;, <span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+<p>以及 空结构体的切片只占用切片头的空间。</p>
+<p>但是关于切片的印象是占据24个字节，在64位机器上<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a []<span class="keyword">int</span></span><br><span class="line">fmt.Println(unsafe.Sizeof(a))</span><br><span class="line"><span class="comment">// 这里会打印出来24</span></span><br></pre></td></tr></table></figure></p>
+<p>所以是否作者写的是错的，为什么说 函数 N 不会引发分配呢？</p>
+<p>为了解决这个疑惑，需要先弄清楚两个问题：</p>
+<ol>
+<li>一个 Go 变量可能会被分配在哪里？</li>
+<li>如何确定一个 Go 变量最终会被分配在哪里？<br><a name="GBMtj"></a><h3 id="变量的分配"><a href="#变量的分配" class="headerlink" title="变量的分配"></a>变量的分配</h3></li>
+</ol>
+<p><img src="https://cdn.nlark.com/yuque/0/2023/png/203997/1683652346313-fdbb5e18-8bdb-42c4-8860-dd98f96f2e95.png#averageHue=%23fbfaf9&amp;clientId=u029a16a2-9260-4&amp;from=paste&amp;id=u2456c55b&amp;originHeight=672&amp;originWidth=578&amp;originalType=binary&amp;ratio=2&amp;rotation=0&amp;showTitle=false&amp;size=101452&amp;status=done&amp;style=none&amp;taskId=ubd1a01e9-b1e1-4e61-a922-60548fc2f11&amp;title=" alt="image.png"></p>
+<p>图片来自 <a href="https://book.douban.com/subject/4292217/" target="_blank" rel="noopener">这里</a> 图 6-1</p>
+<ul>
+<li>初始化的全局变量或静态变量，会被分配在 Data 段。</li>
+<li>未初始化的全局变量或静态变量，会被分配在 BSS 段。</li>
+<li>在函数中定义的局部变量，会被分配在堆（Heap 段）或栈（Stack 段）。<ul>
+<li>实际上，如果考虑到 <a href="https://en.wikipedia.org/wiki/Optimizing_compiler" target="_blank" rel="noopener">编译器优化</a>，局部变量还可能会被 <a href="https://en.wikipedia.org/wiki/Register_allocation" target="_blank" rel="noopener">分配在寄存器</a>，或者直接被 <a href="https://en.wikipedia.org/wiki/Dead_code_elimination" target="_blank" rel="noopener">优化去掉</a>。</li>
+</ul>
+</li>
+</ul>
+<p><a name="lcu96"></a></p>
+<h3 id="Go-内存分配"><a href="#Go-内存分配" class="headerlink" title="Go 内存分配"></a>Go 内存分配</h3><ul>
+<li>堆（heap）<ul>
+<li>由 <a href="https://en.wikipedia.org/wiki/Garbage_collection_(computer_science" target="_blank" rel="noopener">GC</a>) 负责回收。</li>
+<li>对应于进程地址空间的堆。</li>
+</ul>
+</li>
+<li>栈（stack）<ul>
+<li>不涉及 <a href="https://en.wikipedia.org/wiki/Garbage_collection_(computer_science" target="_blank" rel="noopener">GC</a>) 操作。</li>
+<li>每个 <a href="https://golang.org/doc/effective_go.html#goroutines" target="_blank" rel="noopener">goroutine</a> 都有自己的栈，初始时被分配在进程地址空间的栈上，扩容时被分配在进程地址空间的堆上。</li>
+</ul>
+</li>
+</ul>
+<p>Go 变量主要分为两种：</p>
+<ul>
+<li>全局变量<ul>
+<li>会被 Go 编译器标记为一些特殊的 <a href="https://github.com/golang/go/blob/go1.11.4/src/cmd/internal/objabi/symkind.go#L46-L57" target="_blank" rel="noopener">符号类型</a>，分配在堆上还是栈上目前尚不清楚，不过不是本文讨论的重点。</li>
+</ul>
+</li>
+<li>局部变量</li>
+</ul>
+<p>所以综上，对于在函数中定义的 <strong>Go 局部变量：要么被分配在堆上，要么被分配在栈上</strong>。</p>
+<p><a name="RXN2j"></a></p>
+<h3 id="确定-Go-变量最终的分配位置"><a href="#确定-Go-变量最终的分配位置" class="headerlink" title="确定 Go 变量最终的分配位置"></a>确定 Go 变量最终的分配位置</h3><p>按照官方 FAQ <a href="https://golang.org/doc/faq#stack_or_heap" target="_blank" rel="noopener">How do I know whether a variable is allocated on the heap or the stack?</a> 的解释：</p>
+<ul>
+<li>Go 编译器会尽可能将变量分配在栈上</li>
+<li>以下两种情况，Go 编译器会将变量分配在堆上<ul>
+<li>如果一个变量被取地址（has its address taken），并且被逃逸分析（<a href="https://dave.cheney.net/high-performance-go-workshop/dotgo-paris.html#escape_analysis" target="_blank" rel="noopener">escape analysis</a>）识别为 “逃逸到堆”（escapes to heap）</li>
+<li>如果一个变量很大（very large）</li>
+</ul>
+</li>
+</ul>
+<p><a name="iCQ4G"></a></p>
+<h4 id="逃逸分析"><a href="#逃逸分析" class="headerlink" title="逃逸分析"></a>逃逸分析</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"github.com/bradfitz/iter"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">for</span> <span class="keyword">range</span> iter.N(<span class="number">4</span>) &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">go run -gcflags='-m -m' main.go</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span> command-line-arguments</span><br><span class="line">./main.go:5:6: can inline main with cost 7 as: func() &#123; for loop &#125;</span><br><span class="line">./main.go:6:18: inlining call to iter.N</span><br><span class="line">./main.go:6:18: make([]struct &#123;&#125;, iter.n) escapes to heap:</span><br><span class="line">./main.go:6:18:   flow: &#123;heap&#125; = &amp;&#123;storage for make([]struct &#123;&#125;, iter.n)&#125;:</span><br><span class="line">./main.go:6:18:     from make([]struct &#123;&#125;, iter.n) (non-constant size) at ./main.go:6:18</span><br><span class="line">./main.go:6:18: make([]struct &#123;&#125;, iter.n) escapes to heap</span><br></pre></td></tr></table></figure>
+<p>按照前面的分析，从 “make([]struct {}, iter.n) escapes to heap” 的信息，推断：make([]struct {}, iter.n) 会被分配在堆上。<br>到这里，最初的疑惑似乎已经有了答案：make([]struct {}, iter.n) 一定会引发堆分配，那是 Brad Fitzpatrick 的注释写错了吗？</p>
+<p><a name="coZbd"></a></p>
+<h4 id="内存分配器追踪"><a href="#内存分配器追踪" class="headerlink" title="内存分配器追踪"></a>内存分配器追踪</h4><p>除了逃逸分析，Go 还提供了一种叫内存分配器追踪（<a href="https://github.com/golang/go/wiki/Performance#memory-allocator-trace" target="_blank" rel="noopener">Memory Allocator Trace</a>）的方法，用于细粒度地分析由程序引发的所有堆分配（和释放）操作：<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GODEBUG=allocfreetrace=1 go run main.go 2&gt;&amp;1 | grep -C 10</span><br></pre></td></tr></table></figure></p>
+<p>因为进行内存分配器追踪时，很多由 runtime 引发的分配信息也会被打印出来，所以用 grep 进行过滤，只显示由用户代码（user code）引发的分配信息。然而这里的输出结果为空，表明 make([]struct {}, iter.n) 没有引发任何堆分配。<br>内存分配器追踪的结论与逃逸分析的结论截然相反！那到底哪个结论是对的呢？</p>
+<p><a name="QsGMF"></a></p>
+<h4 id="汇编分析"><a href="#汇编分析" class="headerlink" title="汇编分析"></a>汇编分析</h4><p>黔驴技穷之际，<a href="https://andrestc.com/post/go-memory-allocation-pt1/" target="_blank" rel="noopener">Go’s Memory Allocator - Overview</a> 这篇文章给了提示：<br>So, we know that i is going to be allocated on the heap. But how does the runtime set that up? With the compiler’s help! <strong>We can get an idea from reading the generated assembly.</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">go tool compile -N -l -S main.go</span><br><span class="line"></span><br><span class="line">0x0014 00020 (escape/p10/main.go:8)      MOVQ    AX, main.n+88(SP)</span><br><span class="line">0x0019 00025 (escape/p10/main.go:8)      MOVQ    $0, main.~r0+24(SP)</span><br><span class="line">0x0022 00034 (escape/p10/main.go:8)      MOVUPS  X15, main.~r0+32(SP)</span><br><span class="line">0x0028 00040 (escape/p10/main.go:9)      MOVQ    main.n+88(SP), CX</span><br><span class="line">0x002d 00045 (escape/p10/main.go:9)      MOVQ    main.n+88(SP), BX</span><br><span class="line">0x0032 00050 (escape/p10/main.go:9)      LEAQ    type:struct &#123;&#125;(SB), AX</span><br><span class="line">0x0039 00057 (escape/p10/main.go:9)      PCDATA  $1, $0</span><br><span class="line">0x0039 00057 (escape/p10/main.go:9)      CALL    runtime.makeslice(SB)</span><br></pre></td></tr></table></figure>
+<p>可以看到，其中有一处对 runtime.makeslice(SB) 的调用，显然是由 make([]struct{}, n) 引发的。</p>
+<p>查看 <a href="https://github.com/golang/go/blob/go1.11.4/src/runtime/slice.go#L55-L72" target="_blank" rel="noopener">runtime.makeslice</a> 的源码：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">makeslice</span><span class="params">(et *_type, <span class="built_in">len</span>, <span class="built_in">cap</span> <span class="keyword">int</span>)</span> <span class="title">slice</span></span> &#123;</span><br><span class="line">	...</span><br><span class="line">	p := mallocgc(et.size*<span class="keyword">uintptr</span>(<span class="built_in">cap</span>), et, <span class="literal">true</span>)</span><br><span class="line">	<span class="keyword">return</span> slice&#123;p, <span class="built_in">len</span>, <span class="built_in">cap</span>&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中，<a href="https://github.com/golang/go/blob/go1.11.4/src/runtime/malloc.go#L773-L1001" target="_blank" rel="noopener">mallocgc</a> 的源码如下：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">mallocgc</span><span class="params">(size <span class="keyword">uintptr</span>, typ *_type, needzero <span class="keyword">bool</span>)</span> <span class="title">unsafe</span>.<span class="title">Pointer</span></span> &#123;</span><br><span class="line">	...</span><br><span class="line">	<span class="keyword">if</span> size == <span class="number">0</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> unsafe.Pointer(&amp;zerobase)</span><br><span class="line">	&#125;</span><br><span class="line">	...</span><br><span class="line">	<span class="keyword">if</span> debug.allocfreetrace != <span class="number">0</span> &#123;</span><br><span class="line">		tracealloc(x, size, typ)</span><br><span class="line">	&#125;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>结合上述几段源码，可以看出：</p>
+<ul>
+<li>makeslice 函数中：slice 结构体是 Go 切片 —— array 是指向数组片段的指针，len 是数组片段的长度，cap 是数组片段的最大长度。</li>
+<li>makeslice 函数中：array 的值来自 p，而 p 则是一个指针，它指向由 mallocgc 分配得到的底层数组。</li>
+<li>mallocgc 函数中：<strong>因为空结构体的 size 为 0，所以 mallocgc 并没有实际进行堆分配</strong>；由于没有执行到 tracealloc 的地方，所以进行内存分配器追踪时，不会采集到相关的分配信息。</li>
+<li>makeslice 函数中：切片 slice 本身是以结构体的形式返回的，所以只会被分配在栈上。</li>
+</ul>
+<p><a name="caESN"></a></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>经过一系列的探索和分析，至此，可以得出以下结论：</p>
+<ul>
+<li>make([]struct{}, n) 只会被分配在栈上，而不会被分配在堆上。</li>
+<li>Brad Fitzpatrick 的注释是对的，并且他的意思是 “不会引发堆分配”。</li>
+<li>逃逸分析识别出 escapes to heap，并不一定就是堆分配，也可能是栈分配。</li>
+<li>进行内存分配器追踪时，如果采集不到堆分配信息，那一定只有栈分配。</li>
+</ul>
+<p>最后，来解答文章标题提出的疑问 —— 如何确定一个 Go 变量会被分配在哪里？对此：</p>
+<ol>
+<li>先对代码作<strong>逃逸分析</strong>。<ul>
+<li>如果该变量被识别为 escapes to heap，那么它十有八九是被分配在堆上。</li>
+<li>如果该变量被识别为 does not escape，或者没有与之相关的分析结果，那么它一定是被分配在栈上。</li>
+</ul>
+</li>
+<li>如果对 escapes to heap 心存疑惑，就对代码作<strong>内存分配器追踪</strong>。<ul>
+<li>如果有采集到与该变量相关的分配信息，那么它一定是被分配在堆上。</li>
+<li>否则，该变量一定是被分配在栈上。</li>
+</ul>
+</li>
+<li>此外，如果想知道 Go 编译器是如何将变量分配在堆上或者栈上的，可以去<strong>分析 Go 汇编（以及 runtime 源码）</strong>。</li>
+</ol>
+<p><a name="QJJ3A"></a></p>
+<h2 id="相关阅读"><a href="#相关阅读" class="headerlink" title="相关阅读"></a>相关阅读</h2><ul>
+<li><a href="https://dave.cheney.net/2014/03/25/the-empty-struct" target="_blank" rel="noopener">The empty struct</a></li>
+<li><a href="https://blog.golang.org/go-slices-usage-and-internals" target="_blank" rel="noopener">Go Slices: usage and internals</a></li>
+<li><a href="https://dave.cheney.net/high-performance-go-workshop/dotgo-paris.html#escape_analysis" target="_blank" rel="noopener">Escape analysis</a></li>
+<li><a href="https://andrestc.com/post/go-memory-allocation-pt1/" target="_blank" rel="noopener">Go’s Memory Allocator - Overview</a></li>
+<li><a href="https://cmc.gitbook.io/go-internals/chapter-i-go-assembly" target="_blank" rel="noopener">Go internals, Chapter 1: Go assembly</a></li>
+<li><a href="https://dave.cheney.net/2014/06/07/five-things-that-make-go-fast" target="_blank" rel="noopener">Five things that make Go fast</a></li>
+</ul>
 
         
         </div>
@@ -256,7 +357,7 @@
 
 </div>
 
-    <a data-url="https://www.liangyouze.com/2018/07/31/关于iframe跨域传输/" data-id="clhgk6rho000v5ou3r078uqho" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="https://www.liangyouze.com/2022/04/05/由一行代码引发的变量分配思考/" data-id="clhgk6rhu00175ou34x6l01fc" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -324,7 +425,7 @@
 
             
     
-        <a href="https://www.liangyouze.com/2018/07/31/关于iframe跨域传输/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="https://www.liangyouze.com/2018/07/31/关于iframe跨域传输/">评论</a>
+        <a href="https://www.liangyouze.com/2022/04/05/由一行代码引发的变量分配思考/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="https://www.liangyouze.com/2022/04/05/由一行代码引发的变量分配思考/">评论</a>
     
 
         </footer>
@@ -333,19 +434,19 @@
         
 <nav id="article-nav">
     
-        <a href="/2018/08/10/关于生成订单号规则的一些思考/" id="article-nav-newer" class="article-nav-link-wrap">
+        <a href="/2023/05/05/高阶函数编程技巧/" id="article-nav-newer" class="article-nav-link-wrap">
             <strong class="article-nav-caption">上一篇</strong>
             <div class="article-nav-title">
                 
-                    关于生成订单号规则的一些思考
+                    高阶函数编程技巧
                 
             </div>
         </a>
     
     
-        <a href="/2018/05/11/关于docker/" id="article-nav-older" class="article-nav-link-wrap">
+        <a href="/2021/01/01/2020年总结/" id="article-nav-older" class="article-nav-link-wrap">
             <strong class="article-nav-caption">下一篇</strong>
-            <div class="article-nav-title">初识Docker</div>
+            <div class="article-nav-title">2020年总结</div>
         </a>
     
 </nav>
@@ -549,9 +650,9 @@
     <script>
     var disqus_config = function () {
         
-            this.page.url = 'https://www.liangyouze.com/2018/07/31/关于iframe跨域传输/';
+            this.page.url = 'https://www.liangyouze.com/2022/04/05/由一行代码引发的变量分配思考/';
         
-        this.page.identifier = '关于iframe跨域传输';
+        this.page.identifier = '由一行代码引发的变量分配思考';
     };
     (function() { 
         var d = document, s = d.createElement('script');  
