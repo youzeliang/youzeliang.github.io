@@ -5,19 +5,19 @@
     
     <title>gin源码阅读 | 梁友泽的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="整体结构认识 gin框架处理请求的入口函数ServeHTTP：12345678910111213// gin.gofunc (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) &amp;#123;  // 这里使用了对象池	c := engine.pool.Get().(*Context)  // Get对象后做初始化">
+    <meta name="description" content="整体结构认识">
 <meta name="keywords" content="go">
 <meta property="og:type" content="article">
 <meta property="og:title" content="gin源码阅读">
 <meta property="og:url" content="https://www.liangyouze.com/2022/05/05/gin源码阅读/index.html">
 <meta property="og:site_name" content="梁友泽的博客">
-<meta property="og:description" content="整体结构认识 gin框架处理请求的入口函数ServeHTTP：12345678910111213// gin.gofunc (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) &amp;#123;  // 这里使用了对象池	c := engine.pool.Get().(*Context)  // Get对象后做初始化">
+<meta property="og:description" content="整体结构认识">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://cdn.nlark.com/yuque/0/2021/png/203997/1616484464490-ba8bd48c-358f-4abd-9619-3a3ed08eefc0.png#averageHue=%23caeeca&height=251&id=E0waV&originHeight=502&originWidth=724&originalType=binary&ratio=1&rotation=0&showTitle=false&size=104418&status=done&style=none&title=&width=362">
-<meta property="og:updated_time" content="2023-05-10T16:08:31.728Z">
+<meta property="og:updated_time" content="2023-05-10T16:10:49.388Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="gin源码阅读">
-<meta name="twitter:description" content="整体结构认识 gin框架处理请求的入口函数ServeHTTP：12345678910111213// gin.gofunc (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) &amp;#123;  // 这里使用了对象池	c := engine.pool.Get().(*Context)  // Get对象后做初始化">
+<meta name="twitter:description" content="整体结构认识">
 <meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2021/png/203997/1616484464490-ba8bd48c-358f-4abd-9619-3a3ed08eefc0.png#averageHue=%23caeeca&height=251&id=E0waV&originHeight=502&originWidth=724&originalType=binary&ratio=1&rotation=0&showTitle=false&size=104418&status=done&style=none&title=&width=362">
     
 
@@ -242,7 +242,7 @@
         
             
             <p><a name="Zwt6S"></a></p>
-<h2 id="整体结构认识"><a href="#整体结构认识" class="headerlink" title="整体结构认识"></a>整体结构认识</h2><p><a name="1MRiZ"></a></p>
+<h2 id="整体结构认识"><a href="#整体结构认识" class="headerlink" title="整体结构认识  "></a>整体结构认识  <a id="more"></a></h2><p><a name="1MRiZ"></a></p>
 <h2 id=""><a href="#" class="headerlink" title=""></a><img src="https://cdn.nlark.com/yuque/0/2021/png/203997/1616484464490-ba8bd48c-358f-4abd-9619-3a3ed08eefc0.png#averageHue=%23caeeca&amp;height=251&amp;id=E0waV&amp;originHeight=502&amp;originWidth=724&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=104418&amp;status=done&amp;style=none&amp;title=&amp;width=362" alt="image.png"></h2><p>gin框架处理请求的入口函数<code>ServeHTTP</code>：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// gin.go</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(engine *Engine)</span> <span class="title">ServeHTTP</span><span class="params">(w http.ResponseWriter, req *http.Request)</span></span> &#123;</span><br><span class="line">  <span class="comment">// 这里使用了对象池</span></span><br><span class="line">	c := engine.pool.Get().(*Context)</span><br><span class="line">  <span class="comment">// Get对象后做初始化</span></span><br><span class="line">	c.writermem.reset(w)</span><br><span class="line">	c.Request = req</span><br><span class="line">	c.reset()</span><br><span class="line"></span><br><span class="line">	engine.handleHTTPRequest(c)  <span class="comment">// 处理HTTP请求的函数</span></span><br><span class="line"></span><br><span class="line">	engine.pool.Put(c)  <span class="comment">// 处理完请求后将对象放回池子</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <ul>
 <li>为减少gc重复回收， 这里使用sync.pool管理自定义Context对象</li>
@@ -295,7 +295,7 @@
 
 </div>
 
-    <a data-url="https://www.liangyouze.com/2022/05/05/gin源码阅读/" data-id="clhhwb17i000lxzu3bxeamwle" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="https://www.liangyouze.com/2022/05/05/gin源码阅读/" data-id="clhhwdo7u000o6du3arij4ubm" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
