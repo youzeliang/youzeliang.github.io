@@ -151,7 +151,7 @@
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
-                24
+                25
                 <span>文章</span>
             </div>
             <div class="article-info-block">
@@ -247,7 +247,7 @@
 
 </div>
 
-    <a data-url="https://www.liangyouze.com/2023/05/05/高阶函数编程技巧/" data-id="clhgkfvfz001ussu38hquqfit" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="https://www.liangyouze.com/2023/05/05/高阶函数编程技巧/" data-id="clhhwb184001zxzu3hqn975x5" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -325,6 +325,181 @@
 
 
 
+    <article id="post-gin源码阅读" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2022/05/05/gin源码阅读/">gin源码阅读</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2022/05/05/gin源码阅读/">
+            <time datetime="2022-05-05T11:50:23.000Z" itemprop="datePublished">2022-05-05</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/gin/">gin</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link" href="/tags/go/">go</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p><a name="Zwt6S"></a></p>
+<h2 id="整体结构认识"><a href="#整体结构认识" class="headerlink" title="整体结构认识"></a>整体结构认识</h2><p><a name="1MRiZ"></a></p>
+<h2 id=""><a href="#" class="headerlink" title=""></a><img src="https://cdn.nlark.com/yuque/0/2021/png/203997/1616484464490-ba8bd48c-358f-4abd-9619-3a3ed08eefc0.png#averageHue=%23caeeca&amp;height=251&amp;id=E0waV&amp;originHeight=502&amp;originWidth=724&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=104418&amp;status=done&amp;style=none&amp;title=&amp;width=362" alt="image.png"></h2><p>gin框架处理请求的入口函数<code>ServeHTTP</code>：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// gin.go</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(engine *Engine)</span> <span class="title">ServeHTTP</span><span class="params">(w http.ResponseWriter, req *http.Request)</span></span> &#123;</span><br><span class="line">  <span class="comment">// 这里使用了对象池</span></span><br><span class="line">	c := engine.pool.Get().(*Context)</span><br><span class="line">  <span class="comment">// Get对象后做初始化</span></span><br><span class="line">	c.writermem.reset(w)</span><br><span class="line">	c.Request = req</span><br><span class="line">	c.reset()</span><br><span class="line"></span><br><span class="line">	engine.handleHTTPRequest(c)  <span class="comment">// 处理HTTP请求的函数</span></span><br><span class="line"></span><br><span class="line">	engine.pool.Put(c)  <span class="comment">// 处理完请求后将对象放回池子</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>为减少gc重复回收， 这里使用sync.pool管理自定义Context对象</li>
+<li>将请求reqeust数据copy到Context对象中， 通过Context进行管理</li>
+<li>调用engine.handleHTTPRequest 进行路由分发</li>
+<li>在这里引入自定义的Context对象， 其主要是用来管理数据流转过程时的，上下文数据， 比如response， request， 请求参数params,路径fullpath, 查询缓存, 错误管理， 主要的目的是:避免重复复制数据。</li>
+<li>保证数据的一致性。这是gin最重要的数据结构体</li>
+</ul>
+<p>处理 handleHTTPRequest<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(engine *Engine)</span> <span class="title">handleHTTPRequest</span><span class="params">(c *Context)</span></span> &#123;</span><br><span class="line">	httpMethod := c.Request.Method</span><br><span class="line">	rPath := c.Request.URL.Path</span><br><span class="line">	unescape := <span class="literal">false</span></span><br><span class="line">	<span class="keyword">if</span> engine.UseRawPath &amp;&amp; <span class="built_in">len</span>(c.Request.URL.RawPath) &gt; <span class="number">0</span> &#123;</span><br><span class="line">		rPath = c.Request.URL.RawPath</span><br><span class="line">		unescape = engine.UnescapePathValues</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> engine.RemoveExtraSlash &#123;</span><br><span class="line">		rPath = cleanPath(rPath)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Find root of the tree for the given HTTP method</span></span><br><span class="line">	<span class="comment">// 根据请求方法找到对应的路由树</span></span><br><span class="line">	t := engine.trees</span><br><span class="line">	<span class="keyword">for</span> i, tl := <span class="number">0</span>, <span class="built_in">len</span>(t); i &lt; tl; i++ &#123;</span><br><span class="line">		<span class="keyword">if</span> t[i].method != httpMethod &#123;</span><br><span class="line">			<span class="keyword">continue</span></span><br><span class="line">		&#125;</span><br><span class="line">		root := t[i].root</span><br><span class="line">		<span class="comment">// Find route in tree   在路由树中根据path查找</span></span><br><span class="line">		value := root.getValue(rPath, c.params, unescape)</span><br><span class="line">		<span class="keyword">if</span> value.params != <span class="literal">nil</span> &#123;</span><br><span class="line">			c.Params = *value.params</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> value.handlers != <span class="literal">nil</span> &#123;</span><br><span class="line">            <span class="comment">// 更新Context对象属性，将路由地址管理的多个路由函数都交给Context管理</span></span><br><span class="line">			c.handlers = value.handlers</span><br><span class="line">			c.fullPath = value.fullPath</span><br><span class="line">			<span class="comment">// 执行函数链条,递归执行。 这里的Next特别有意思</span></span><br><span class="line">			c.Next()</span><br><span class="line">			c.writermem.WriteHeaderNow()</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> httpMethod != <span class="string">"CONNECT"</span> &amp;&amp; rPath != <span class="string">"/"</span> &#123;</span><br><span class="line">			<span class="keyword">if</span> value.tsr &amp;&amp; engine.RedirectTrailingSlash &#123;</span><br><span class="line">				redirectTrailingSlash(c)</span><br><span class="line">				<span class="keyword">return</span></span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> engine.RedirectFixedPath &amp;&amp; redirectFixedPath(c, root, engine.RedirectFixedPath) &#123;</span><br><span class="line">				<span class="keyword">return</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">break</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> engine.HandleMethodNotAllowed &#123;</span><br><span class="line">		<span class="keyword">for</span> _, tree := <span class="keyword">range</span> engine.trees &#123;</span><br><span class="line">			<span class="keyword">if</span> tree.method == httpMethod &#123;</span><br><span class="line">				<span class="keyword">continue</span></span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> value := tree.root.getValue(rPath, <span class="literal">nil</span>, unescape); value.handlers != <span class="literal">nil</span> &#123;</span><br><span class="line">				c.handlers = engine.allNoMethod</span><br><span class="line">				serveError(c, http.StatusMethodNotAllowed, default405Body)</span><br><span class="line">				<span class="keyword">return</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	c.handlers = engine.allNoRoute</span><br><span class="line">	serveError(c, http.StatusNotFound, default404Body)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>核心代码<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据路径，请求参数，找到对应的 路由处理函数</span></span><br><span class="line">value := root.getValue(rPath, c.Params, unescape)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 递归的执行关联的handler方法</span></span><br><span class="line">c.Next()</span><br></pre></td></tr></table></figure></p>
+<p>c.Next()方法，这个方法的核心，主要是方便接入中间件(Middleware)，使得代码模块化操作。</p>
+<p>看下Next的具体实现<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *Context)</span> <span class="title">Next</span><span class="params">()</span></span> &#123;</span><br><span class="line">    c.index++</span><br><span class="line">    <span class="keyword">for</span> c.index &lt; <span class="keyword">int8</span>(<span class="built_in">len</span>(c.handlers)) &#123;</span><br><span class="line">        <span class="comment">// 执行关联的中间件方法或者 实际路由处理函数</span></span><br><span class="line">        c.handlers[c.index](c)</span><br><span class="line">        c.index++</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里的Next设计非常有意思。以下是我给出的一个例子<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"fmt"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 洋葱模型</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Context <span class="keyword">struct</span> &#123;</span><br><span class="line">	handles []<span class="function"><span class="keyword">func</span><span class="params">(c *Context)</span></span></span><br><span class="line"><span class="function">	<span class="title">index</span>   <span class="title">int8</span> // 代表上面<span class="title">func</span>的索引</span></span><br><span class="line"><span class="function">&#125;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="title">func</span> <span class="params">(this *Context)</span> <span class="title">Use</span><span class="params">(f <span class="keyword">func</span>(c *Context)</span>)</span> &#123;</span><br><span class="line">	this.handles = <span class="built_in">append</span>(this.handles, f)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *Context)</span> <span class="title">Get</span><span class="params">(path <span class="keyword">string</span>, f <span class="keyword">func</span>(c *Context)</span>)</span> &#123;</span><br><span class="line">	this.handles = <span class="built_in">append</span>(this.handles, f)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *Context)</span> <span class="title">Next</span><span class="params">()</span></span> &#123;</span><br><span class="line">	this.index++</span><br><span class="line">	this.handles[this.index](this)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(this *Context)</span> <span class="title">Run</span><span class="params">()</span></span> &#123;</span><br><span class="line">	this.handles[<span class="number">0</span>](this) <span class="comment">// 执行第一个函数</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Middleware1</span><span class="params">()</span> <span class="title">func</span><span class="params">(c *Context)</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(c *Context)</span></span> &#123;</span><br><span class="line">		fmt.Println(<span class="string">"middleware start"</span>)</span><br><span class="line">		c.Next()</span><br><span class="line">		fmt.Println(<span class="string">"middleware end"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Middleware2</span><span class="params">()</span> <span class="title">func</span><span class="params">(c *Context)</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(c *Context)</span></span> &#123;</span><br><span class="line">		fmt.Println(<span class="string">"middleware2 start"</span>)</span><br><span class="line">		c.Next()</span><br><span class="line">		fmt.Println(<span class="string">"middleware2 end"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line"></span><br><span class="line">	c := &amp;Context&#123;&#125;</span><br><span class="line">	c.Use(Middleware1())</span><br><span class="line">	c.Use(Middleware2())</span><br><span class="line"></span><br><span class="line">	c.Get(<span class="string">"/"</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *Context)</span></span> &#123;</span><br><span class="line">		fmt.Println(<span class="string">"Get handle func "</span>)</span><br><span class="line">	&#125;,</span><br><span class="line">	)</span><br><span class="line"></span><br><span class="line">	c.Run()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ol>
+<li>创建一个Context结构体</li>
+<li>调用Use方法，将中间件函数添加到handles中</li>
+<li>调用Get方法，将路由函数添加到handles中</li>
+<li>调用Run方法，执行第一个函数</li>
+<li>执行第一个函数，打印middleware start，然后调用Next方法</li>
+<li>Next方法中，index++，此时index为1，然后执行handles[1]，也就是第二个函数</li>
+<li>执行第二个函数，打印middleware2 start，然后调用Next方法</li>
+<li>Next方法中，index++，此时index为2，然后执行handles[2]，也就是第三个函数</li>
+<li>执行第三个函数，打印Get handle func</li>
+<li>执行完毕，返回到第二个函数，打印middleware2 end</li>
+<li>返回到第一个函数，打印middleware end</li>
+</ol>
+<p>其调用关系<br>实现了Next方法的伪代码，加深理解：</p>
+<p>处理函数有先后执行关系， 并且处理函数可以通过调用Abort方法， 提前返回，不用递归调用到实际处理函数。<br>这些中间件，可以方便的使我们的业务代码接入权限校验auth，日志管理等其他功能模块。</p>
+<p><a name="A9CEa"></a></p>
+<p>##<br><a name="SAwpE"></a></p>
+<h2 id="路由匹配"><a href="#路由匹配" class="headerlink" title="路由匹配"></a>路由匹配</h2><p>路由匹配是由节点的 <code>getValue</code>方法实现的。<code>getValue</code>根据给定的路径(键)返回<code>nodeValue</code>值，保存注册的处理函数和匹配到的路径参数数据。</p>
+<p>gin框架涉及中间件相关有4个常用的方法，它们分别是<code>c.Next()</code>、<code>c.Abort()</code>、<code>c.Set()</code>、<code>c.Get()</code>。</p>
+<p>中间件的注册</p>
+<p>gin框架中的中间件设计很巧妙，从最常用的<code>r := gin.Default()</code>的<code>Default</code>函数开始看，它内部构造一个新的<code>engine</code>之后就通过<code>Use()</code>函数注册了<code>Logger</code>中间件和<code>Recovery</code>中间件：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Default</span><span class="params">()</span> *<span class="title">Engine</span></span> &#123;</span><br><span class="line">	debugPrintWARNINGDefault()</span><br><span class="line">	engine := New()</span><br><span class="line">	engine.Use(Logger(), Recovery())  <span class="comment">// 默认注册的两个中间件</span></span><br><span class="line">	<span class="keyword">return</span> engine</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Use() 函数<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(engine *Engine)</span> <span class="title">Use</span><span class="params">(middleware ...HandlerFunc)</span> <span class="title">IRoutes</span></span> &#123;</span><br><span class="line">	engine.RouterGroup.Use(middleware...)  <span class="comment">// 实际上还是调用的RouterGroup的Use函数</span></span><br><span class="line">	engine.rebuild404Handlers()</span><br><span class="line">	engine.rebuild405Handlers()</span><br><span class="line">	<span class="keyword">return</span> engine</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>注册中间件其实就是将中间件函数追加到<code>group.Handlers</code>中：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Use adds middleware to the group, see example code in GitHub.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(group *RouterGroup)</span> <span class="title">Use</span><span class="params">(middleware ...HandlerFunc)</span> <span class="title">IRoutes</span></span> &#123;</span><br><span class="line">	group.Handlers = <span class="built_in">append</span>(group.Handlers, middleware...)</span><br><span class="line">	<span class="keyword">return</span> group.returnObj()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>而我们注册路由时会将对应路由的函数和之前的中间件函数结合到一起：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(group *RouterGroup)</span> <span class="title">handle</span><span class="params">(httpMethod, relativePath <span class="keyword">string</span>, handlers HandlersChain)</span> <span class="title">IRoutes</span></span> &#123;</span><br><span class="line">	absolutePath := group.calculateAbsolutePath(relativePath)</span><br><span class="line">	handlers = group.combineHandlers(handlers)  <span class="comment">// 将处理请求的函数与中间件函数结合</span></span><br><span class="line">	group.engine.addRoute(httpMethod, absolutePath, handlers)</span><br><span class="line">	<span class="keyword">return</span> group.returnObj()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"github.com/gin-gonic/gin"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	r := gin.Default()</span><br><span class="line">	r.GET(<span class="string">"/ping"</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">		c.JSON(<span class="number">200</span>, gin.H&#123;</span><br><span class="line">			<span class="string">"message"</span>: <span class="string">"success"</span>,</span><br><span class="line">		&#125;)</span><br><span class="line">	&#125;)</span><br><span class="line">	r.Run() <span class="comment">// listen and serve on 0.0.0.0:8080</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>所以其实gin的中间件，其实就是Gin定义的一个HandlerFunc<br>先看r.Run()<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(engine *Engine)</span> <span class="title">Run</span><span class="params">(addr ...<span class="keyword">string</span>)</span> <span class="params">(err error)</span></span> &#123;</span><br><span class="line">	<span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; debugPrintError(err) &#125;()</span><br><span class="line"></span><br><span class="line">	address := resolveAddress(addr)</span><br><span class="line">	debugPrint(<span class="string">"Listening and serving HTTP on %s\n"</span>, address)</span><br><span class="line">	err = http.ListenAndServe(address, engine)</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Gin 提供了gin.BasicAuth 生成基本认证的中间件<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">r := gin.Default()</span><br><span class="line"></span><br><span class="line">r.Use(gin.BasicAuth(gin.Accounts&#123;</span><br><span class="line">	<span class="string">"admin"</span>: <span class="string">"123456"</span>,</span><br><span class="line">&#125;))</span><br></pre></td></tr></table></figure></p>
+<p>比如访问的时候  需要用户名和密码</p>
+<p>也可对特定的URL进行认证，也就是像这样<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	r := gin.Default()</span><br><span class="line"></span><br><span class="line">	r.GET(<span class="string">"/"</span>, <span class="function"><span class="keyword">func</span><span class="params">(c *gin.Context)</span></span> &#123;</span><br><span class="line">		c.JSON(<span class="number">200</span>, <span class="string">"首页"</span>)</span><br><span class="line">	&#125;)</span><br><span class="line"></span><br><span class="line">	adminGroup := r.Group(<span class="string">"/admin"</span>)</span><br><span class="line">	adminGroup.Use(gin.BasicAuth(gin.Accounts&#123;</span><br><span class="line">		<span class="string">"admin"</span>: <span class="string">"123456"</span>,</span><br><span class="line">	&#125;))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://www.liangyouze.com/2022/05/05/gin源码阅读/" data-id="clhhwb17i000lxzu3bxeamwle" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="https://www.liangyouze.com/2022/05/05/gin源码阅读/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="https://www.liangyouze.com/2022/05/05/gin源码阅读/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
     <article id="post-由一行代码引发的变量分配思考" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
@@ -380,7 +555,7 @@
 
 </div>
 
-    <a data-url="https://www.liangyouze.com/2022/04/05/由一行代码引发的变量分配思考/" data-id="clhgkfvfs001dssu3un48qk6m" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="https://www.liangyouze.com/2022/04/05/由一行代码引发的变量分配思考/" data-id="clhhwb181001rxzu334elv0pd" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -513,7 +688,7 @@
 
 </div>
 
-    <a data-url="https://www.liangyouze.com/2021/01/01/2020年总结/" data-id="clhgkfvf60006ssu3ujh8hx9u" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="https://www.liangyouze.com/2021/01/01/2020年总结/" data-id="clhhwb1780008xzu3rvbjgfzg" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -647,7 +822,7 @@
 
 </div>
 
-    <a data-url="https://www.liangyouze.com/2020/08/11/内存对齐/" data-id="clhgkfvfr0019ssu34ags585p" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="https://www.liangyouze.com/2020/08/11/内存对齐/" data-id="clhhwb17t0019xzu3rvlyur9g" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -780,7 +955,7 @@
 
 </div>
 
-    <a data-url="https://www.liangyouze.com/2020/07/11/go-map/" data-id="clhgkfvfj000qssu3qsiryh7a" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="https://www.liangyouze.com/2020/07/11/go-map/" data-id="clhhwb17q000zxzu3qny008fk" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -924,7 +1099,7 @@
 
 </div>
 
-    <a data-url="https://www.liangyouze.com/2020/03/11/golang切片/" data-id="clhgkfvfm000vssu3m363euc7" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="https://www.liangyouze.com/2020/03/11/golang切片/" data-id="clhhwb17s0015xzu30n22badr" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1057,7 +1232,7 @@
 
 </div>
 
-    <a data-url="https://www.liangyouze.com/2020/02/11/给字符串加索引/" data-id="clhgkfvfx001qssu3dyd6jrpd" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="https://www.liangyouze.com/2020/02/11/给字符串加索引/" data-id="clhhwb183001wxzu3f33u6elv" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1191,7 +1366,7 @@
 
 </div>
 
-    <a data-url="https://www.liangyouze.com/2020/01/01/2019年总结/" data-id="clhgkfvev0000ssu3l99qgb64" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="https://www.liangyouze.com/2020/01/01/2019年总结/" data-id="clhhwb16z0002xzu363sr4gv6" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1324,7 +1499,7 @@
 
 </div>
 
-    <a data-url="https://www.liangyouze.com/2019/12/17/数据删掉一半，表的大小不变/" data-id="clhgkfvfu001fssu3jab8mkzr" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="https://www.liangyouze.com/2019/12/17/数据删掉一半，表的大小不变/" data-id="clhhwb17x001ixzu3m1w28c1k" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -1402,142 +1577,6 @@
 
 
 
-    <article id="post-分析MySQL中隐式转换导致查询结果错误及索引不可用" class="article article-type-post" itemscope itemprop="blogPost">
-    <div class="article-inner">
-        
-        
-            <header class="article-header">
-                
-    
-        <h1 itemprop="name">
-            <a class="article-title" href="/2019/10/11/分析MySQL中隐式转换导致查询结果错误及索引不可用/">分析MySQL中隐式转换导致查询结果错误及索引不可用</a>
-        </h1>
-    
-
-                
-                    <div class="article-meta">
-                        
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2019/10/11/分析MySQL中隐式转换导致查询结果错误及索引不可用/">
-            <time datetime="2019-10-11T06:10:23.000Z" itemprop="datePublished">2019-10-11</time>
-        </a>
-    </div>
-
-
-                        
-    <div class="article-category">
-    	<i class="fa fa-folder"></i>
-        <a class="article-category-link" href="/categories/MySQL/">MySQL</a>
-    </div>
-
-                        
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link" href="/tags/MySQL/">MySQL</a>
-    </div>
-
-                    </div>
-                
-            </header>
-        
-        
-        <div class="article-entry" itemprop="articleBody">
-        
-            <p><p>以下是例子</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="keyword">TABLE</span> <span class="keyword">WHERE</span> xxx = <span class="number">11</span></span><br></pre></td></tr></table></figure>
-<p>如果列xxx确实只有11的，你是否就认为筛选出来的就一定只有xxx=11的呢？</p>
-<p>在过滤字段为数值类型的时候，数值类型有一种隐式转换，如果是以数字开头的，包含有字符，后面的字符会被截断，只取前面的数字值。</p>
-            <p class="article-more-link">
-                <a href="/2019/10/11/分析MySQL中隐式转换导致查询结果错误及索引不可用/#more">查看更多</a>
-            </p>
-        
-        </div>
-        <footer class="article-footer">
-            <div class="share-container">
-
-
-
-</div>
-
-    <a data-url="https://www.liangyouze.com/2019/10/11/分析MySQL中隐式转换导致查询结果错误及索引不可用/" data-id="clhgkfvfw001mssu3krzfx6sx" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
-
-            
-    
-        <a href="https://www.liangyouze.com/2019/10/11/分析MySQL中隐式转换导致查询结果错误及索引不可用/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="https://www.liangyouze.com/2019/10/11/分析MySQL中隐式转换导致查询结果错误及索引不可用/">评论</a>
-    
-
-        </footer>
-    </div>
-    
-</article>
-
-
-
     <nav id="page-nav">
         <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
     </nav>
@@ -1568,6 +1607,25 @@
                             <p class="item-category"><a class="article-category-link" href="/categories/函数/">函数</a></p>
                             <p class="item-title"><a href="/2023/05/05/高阶函数编程技巧/" class="title">高阶函数编程技巧</a></p>
                             <p class="item-date"><time datetime="2023-05-05T11:50:23.000Z" itemprop="datePublished">2023-05-05</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2022/05/05/gin源码阅读/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/gin/">gin</a></p>
+                            <p class="item-title"><a href="/2022/05/05/gin源码阅读/" class="title">gin源码阅读</a></p>
+                            <p class="item-date"><time datetime="2022-05-05T11:50:23.000Z" itemprop="datePublished">2022-05-05</time></p>
                         </div>
                     </li>
                 
@@ -1628,25 +1686,6 @@
                         </div>
                     </li>
                 
-                    <li>
-                        
-                        <!-- <div class="item-thumbnail">
-                            <a href="/2020/07/11/go-map/" class="thumbnail">
-    
-    
-        <span class="thumbnail-image thumbnail-none"></span>
-    
-</a>
-
-                        </div> -->
-                        
-                        <div class="item-inner">
-                            <p class="item-category"><a class="article-category-link" href="/categories/map/">map</a></p>
-                            <p class="item-title"><a href="/2020/07/11/go-map/" class="title">深入理解go map</a></p>
-                            <p class="item-date"><time datetime="2020-07-11T06:10:23.000Z" itemprop="datePublished">2020-07-11</time></p>
-                        </div>
-                    </li>
-                
             </ul>
         </div>
     </div>
@@ -1656,7 +1695,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">分类</h3>
         <div class="widget">
-            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL/">MySQL</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/map/">map</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/vim/">vim</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/内存逃逸/">内存逃逸</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/函数/">函数</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/杂谈/">杂谈</a><span class="category-list-count">3</span></li></ul>
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL/">MySQL</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/gin/">gin</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/map/">map</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/vim/">vim</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/内存逃逸/">内存逃逸</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/函数/">函数</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/杂谈/">杂谈</a><span class="category-list-count">3</span></li></ul>
         </div>
     </div>
 
@@ -1665,7 +1704,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">May 2023</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">January 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">May 2023</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">May 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">January 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1674,7 +1713,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签</h3>
         <div class="widget">
-            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/">MySQL</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/">golang</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iframe/">iframe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存对齐/">内存对齐</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/字符串/">字符串</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/索引/">索引</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/规则/">规则</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/订单号/">订单号</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/跨域/">跨域</a><span class="tag-list-count">1</span></li></ul>
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/">MySQL</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/">Python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/">elasticsearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/">go</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/">golang</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iframe/">iframe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/">vim</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/内存对齐/">内存对齐</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/字符串/">字符串</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/杂谈/">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/索引/">索引</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/规则/">规则</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/订单号/">订单号</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/读书/">读书</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/跨域/">跨域</a><span class="tag-list-count">1</span></li></ul>
         </div>
     </div>
 
@@ -1683,7 +1722,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">标签云</h3>
         <div class="widget tagcloud">
-            <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/MySQL/" style="font-size: 20px;">MySQL</a> <a href="/tags/Python/" style="font-size: 10px;">Python</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/go/" style="font-size: 16.67px;">go</a> <a href="/tags/golang/" style="font-size: 16.67px;">golang</a> <a href="/tags/iframe/" style="font-size: 10px;">iframe</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/内存对齐/" style="font-size: 10px;">内存对齐</a> <a href="/tags/字符串/" style="font-size: 13.33px;">字符串</a> <a href="/tags/杂谈/" style="font-size: 16.67px;">杂谈</a> <a href="/tags/索引/" style="font-size: 10px;">索引</a> <a href="/tags/规则/" style="font-size: 10px;">规则</a> <a href="/tags/订单号/" style="font-size: 10px;">订单号</a> <a href="/tags/读书/" style="font-size: 10px;">读书</a> <a href="/tags/跨域/" style="font-size: 10px;">跨域</a>
+            <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/MySQL/" style="font-size: 20px;">MySQL</a> <a href="/tags/Python/" style="font-size: 10px;">Python</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/golang/" style="font-size: 16.67px;">golang</a> <a href="/tags/iframe/" style="font-size: 10px;">iframe</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/内存对齐/" style="font-size: 10px;">内存对齐</a> <a href="/tags/字符串/" style="font-size: 13.33px;">字符串</a> <a href="/tags/杂谈/" style="font-size: 16.67px;">杂谈</a> <a href="/tags/索引/" style="font-size: 10px;">索引</a> <a href="/tags/规则/" style="font-size: 10px;">规则</a> <a href="/tags/订单号/" style="font-size: 10px;">订单号</a> <a href="/tags/读书/" style="font-size: 10px;">读书</a> <a href="/tags/跨域/" style="font-size: 10px;">跨域</a>
         </div>
     </div>
 
