@@ -16,7 +16,7 @@
 <meta property="og:image" content="https://cdn.nlark.com/yuque/0/2020/png/203997/1597226917625-e6fd77f5-c404-42f9-9bac-b6d2843a83a0.png#align=left&display=inline&height=384&margin=%5Bobject%20Object%5D&name=image.png&originHeight=384&originWidth=1021&size=99868&status=done&style=none&width=1021">
 <meta property="og:image" content="https://cdn.nlark.com/yuque/0/2021/png/203997/1610432798301-894e1282-7407-45b2-a289-75a1d0413c40.png#align=left&display=inline&height=334&margin=%5Bobject%20Object%5D&name=image.png&originHeight=334&originWidth=780&size=41790&status=done&style=none&width=780">
 <meta property="og:image" content="https://cdn.nlark.com/yuque/0/2021/png/203997/1610434197485-aab5e786-554b-430f-be79-46d9d2ca61ed.png#align=left&display=inline&height=144&margin=%5Bobject%20Object%5D&name=image.png&originHeight=287&originWidth=1280&size=34727&status=done&style=none&width=640">
-<meta property="og:updated_time" content="2021-10-20T15:15:30.607Z">
+<meta property="og:updated_time" content="2023-05-18T16:22:07.758Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="golang 切片">
 <meta name="twitter:description" content="golang 切片切片是引用切片组成元素：  指针：指向底层数组 长度：切片中元素的长度，不能大于容量 容量：指针所指向的底层数组的总容量  初始化方式  使用make12slice := make([]int, 5)     // 初始化长度和容量都为 5 的切片slice := make([]int, 5, 10) // 初始化长度为 5, 容量为 10 的切片   使用 make 关键字创建">
@@ -268,6 +268,22 @@
 </ol>
 <p><br><a href="https://draveness.me/golang/tree/runtime.makeslice" target="_blank" rel="noopener"><code>runtime.makeslice</code></a> 在最后调用的 <a href="https://draveness.me/golang/tree/runtime.mallocgc" target="_blank" rel="noopener"><code>runtime.mallocgc</code></a> 是用于申请内存的函数，这个函数的实现还是比较复杂，如果遇到了比较小的对象会直接初始化在 Go 语言调度器里面的 P 结构中，而大于 32KB 的对象会在堆上初始化</p>
 <ul>
+<li>为啥是32kb <ul>
+<li>界限的选择是基于一些性能和内存管理的考虑。</li>
+<li>小于等于32KB的对象被认为是比较小的，可以在 P 结构中进行初始化。这样做有以下几个优点：<ul>
+<li>减少对堆的访问：将对象初始化在 P 结构中可以避免频繁地访问堆，减少内存的分配和释放操作，提高程序的性能。</li>
+<li>提高局部性：将对象与对应的 P 结构关联起来，可以提高数据的局部性，减少内存访问的延迟，进一步提升性能。<ul>
+<li>大于32KB的对象被认为是较大的对象，其内存需求比较高。将这些对象直接初始化在堆上有以下几个优点：</li>
+<li>堆的管理更加灵活：堆提供了更加灵活的内存管理机制，可以根据需要动态分配和释放内存，适应各种大小的对象。</li>
+<li>避免过度占用 P 结构：将大对象初始化在堆上可以避免过度占用 P 结构的内存空间，保持 P 结构的高效利用。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
 <li>使用简短定义</li>
 </ul>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">slice := []<span class="keyword">int</span>&#123;<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>&#125;</span><br></pre></td></tr></table></figure>
@@ -374,7 +390,7 @@
 
 </div>
 
-    <a data-url="https://www.liangyouze.com/2020/03/11/golang切片/" data-id="clhjejdga000zluu3dm2o6miq" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+    <a data-url="https://www.liangyouze.com/2020/03/11/golang切片/" data-id="clhtcb0ch000scwu3nv25ge6u" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
 <script>
     (function ($) {
         // Prevent duplicate binding
@@ -515,6 +531,25 @@
                     <li>
                         
                         <!-- <div class="item-thumbnail">
+                            <a href="/2022/06/05/golang逃逸分析/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/内存逃逸/">内存逃逸</a></p>
+                            <p class="item-title"><a href="/2022/06/05/golang逃逸分析/" class="title">golang逃逸分析</a></p>
+                            <p class="item-date"><time datetime="2022-06-05T11:50:23.000Z" itemprop="datePublished">2022-06-05</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
                             <a href="/2022/05/05/gin源码阅读/" class="thumbnail">
     
     
@@ -528,25 +563,6 @@
                             <p class="item-category"><a class="article-category-link" href="/categories/gin/">gin</a></p>
                             <p class="item-title"><a href="/2022/05/05/gin源码阅读/" class="title">gin源码阅读</a></p>
                             <p class="item-date"><time datetime="2022-05-05T11:50:24.000Z" itemprop="datePublished">2022-05-05</time></p>
-                        </div>
-                    </li>
-                
-                    <li>
-                        
-                        <!-- <div class="item-thumbnail">
-                            <a href="/2022/05/05/golang逃逸分析/" class="thumbnail">
-    
-    
-        <span class="thumbnail-image thumbnail-none"></span>
-    
-</a>
-
-                        </div> -->
-                        
-                        <div class="item-inner">
-                            <p class="item-category"><a class="article-category-link" href="/categories/内存逃逸/">内存逃逸</a></p>
-                            <p class="item-title"><a href="/2022/05/05/golang逃逸分析/" class="title">golang逃逸分析</a></p>
-                            <p class="item-date"><time datetime="2022-05-05T11:50:23.000Z" itemprop="datePublished">2022-05-05</time></p>
                         </div>
                     </li>
                 
@@ -606,7 +622,7 @@
     <div class="widget-wrap">
         <h3 class="widget-title">归档</h3>
         <div class="widget">
-            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">May 2023</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">May 2022</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">January 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li></ul>
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">May 2023</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">June 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">May 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">April 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">January 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">August 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">September 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">July 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">June 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a><span class="archive-list-count">1</span></li></ul>
         </div>
     </div>
 
