@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>内存对齐 | 梁友泽的博客</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="内存对齐 内存CPU要想从内存读取数据，需要通过地址总线，把地址传输给内存，内存准备好数据，输出到数据总线若是32位地址总线，可以寻址[0,2的32次方-1]，占用内存4g有些CPU是能够支持访问任意地址的，它是做了很多处理，比如想从地址1读取8字节的数据，CPU会分2次读，第一次从0-7,只取后7字节，第二次从8-15，但只取第一字节。把2次结果拼接起来拿到所需数据。这样比较耗费性能，编译器会把">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内存对齐">
+<meta property="og:url" content="https://www.liangyouze.com/2020/08/11/%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/index.html">
+<meta property="og:site_name" content="梁友泽的博客">
+<meta property="og:description" content="内存对齐 内存CPU要想从内存读取数据，需要通过地址总线，把地址传输给内存，内存准备好数据，输出到数据总线若是32位地址总线，可以寻址[0,2的32次方-1]，占用内存4g有些CPU是能够支持访问任意地址的，它是做了很多处理，比如想从地址1读取8字节的数据，CPU会分2次读，第一次从0-7,只取后7字节，第二次从8-15，但只取第一字节。把2次结果拼接起来拿到所需数据。这样比较耗费性能，编译器会把">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2020/png/203997/1605377064721-24444cc6-8a5d-421d-8e26-cf97671ca235.png#align=left&display=inline&height=301&margin=%5Bobject%20Object%5D&name=image.png&originHeight=401&originWidth=749&size=220553&status=done&style=none&width=562">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2020/png/203997/1605539978350-f73bfde3-25e7-4946-b8a6-6a8269117412.png#align=left&display=inline&height=379&margin=%5Bobject%20Object%5D&name=image.png&originHeight=379&originWidth=646&size=81183&status=done&style=none&width=646">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2020/png/203997/1605540679086-1d5177d5-4dd2-4d07-b7b1-84c898f76df4.png#align=left&display=inline&height=65&margin=%5Bobject%20Object%5D&name=image.png&originHeight=130&originWidth=998&size=24366&status=done&style=none&width=499">
+<meta property="article:published_time" content="2020-08-11T06:10:23.000Z">
+<meta property="article:modified_time" content="2021-02-20T16:10:15.000Z">
+<meta property="article:author" content="梁友泽">
+<meta property="article:tag" content="内存对齐">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2020/png/203997/1605377064721-24444cc6-8a5d-421d-8e26-cf97671ca235.png#align=left&display=inline&height=301&margin=%5Bobject%20Object%5D&name=image.png&originHeight=401&originWidth=749&size=220553&status=done&style=none&width=562">
+    
+
+    
+
+    
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/libs/open-sans/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+<script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+    
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">梁友泽的博客</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives/">分类</a>
+                
+                    <a class="main-nav-link" href="/categories/">归档</a>
+                
+                    <a class="main-nav-link" href="/about">关于</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/rolle.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives/">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories/">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile" class="profile-fixed">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/rolle.png" />
+            <h2 id="name">梁友泽</h2>
+            <h3 id="title">Developer</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>BeiJing, China</span>
+            <a id="follow" target="_blank" href="https://github.com/youzeliang">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                28
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                18
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/youzeliang" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/i@liangyouze.com" target="_blank" title="email" class=tooltip>
+                            <i class="fa fa-email"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/css/images/rolle_wechat.jpg" target="_blank" title="wechat" class=tooltip>
+                            <i class="fa fa-wechat"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-内存对齐" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            内存对齐
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2020/08/11/%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/">
+            <time datetime="2020-08-11T06:10:23.000Z" itemprop="datePublished">2020-08-11</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/golang/">golang</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/" rel="tag">内存对齐</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h1 id="内存对齐"><a href="#内存对齐" class="headerlink" title="内存对齐"></a>内存对齐</h1><p><a name="zxzFd"></a></p>
+<h3 id="内存"><a href="#内存" class="headerlink" title="内存"></a>内存</h3><p><br />CPU要想从内存读取数据，需要通过地址总线，把地址传输给内存，内存准备好数据，输出到数据总线<br />若是32位地址总线，可以寻址[0,2的32次方-1]，占用内存4g<br /><img src="https://cdn.nlark.com/yuque/0/2020/png/203997/1605377064721-24444cc6-8a5d-421d-8e26-cf97671ca235.png#align=left&display=inline&height=301&margin=%5Bobject%20Object%5D&name=image.png&originHeight=401&originWidth=749&size=220553&status=done&style=none&width=562" alt="image.png"><br /><br><br />有些CPU是能够支持访问任意地址的，它是做了很多处理，比如想从地址1读取8字节的数据，CPU会分2次读，第一次从0-7,只取后7字节，第二次从8-15，但只取第一字节。把2次结果拼接起来拿到所需数据。这样比较耗费性能，编译器会把各种类型的值安排到合适的位置，并占用合适的长度。每种类型的对齐边值就是它的对齐边界。int16（2），int32（4），内存对齐要求数据存储地址以及占用的字节数都是它对齐边界的倍数。<br />  <span id="more"></span></p>
+<p><a name="ORDcj"></a></p>
+<h3 id="内存对齐的收益"><a href="#内存对齐的收益" class="headerlink" title="内存对齐的收益"></a>内存对齐的收益</h3><ul>
+<li>提高代码平台兼容性</li>
+<li>优化数据对内存的使用</li>
+<li>避免一些内存不对齐带来的坑</li>
+<li>有助于一些源码的阅读</li>
+</ul>
+<p><a name="txJM0"></a></p>
+<h3 id="为什么要对齐"><a href="#为什么要对齐" class="headerlink" title="为什么要对齐"></a>为什么要对齐</h3><p><br />列举一些常见的单位<br /></p>
+<ul>
+<li>位 bit<ul>
+<li>计算机内存数据存储的最小单位</li>
+</ul>
+</li>
+<li>字节 byte<ul>
+<li>计算机数据处理的基本单位</li>
+</ul>
+</li>
+<li>机器字 machine word<ul>
+<li>计算机用来一次性处理事务的一个固定长度</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>平台原因<ol>
+<li>某些硬件平台只能在某些地址处取某些特定类似的数据</li>
+</ol>
+</li>
+<li>性能原因<ol>
+<li>数据结构应该尽可能地在自然边界上对齐，为了访问未对齐的内存，处理器需要作2次内存访问，而内存对齐就只需要一次访问</li>
+</ol>
+</li>
+<li>64位字的安全访问保证<ol>
+<li>在x86-32上，64位函数使用Pentium MMX之前不存在的指令。在非Linux ARM上，64位函数使用ARMv6k内核之前不可用的指令</li>
+<li>在ARM、x86-32和32MIPS上，调用方有责任安排对原子访问的64位字对齐。变量或分配的结构、数组或切片中的第一个字(word)可以依赖当做是64位对齐的(摘抄的,不是太懂)</li>
+<li>操作系统的cpu不是一个字节一个字节访问的，而是2，4，8这样的字长来访问的</li>
+<li>处理器从存储器子系统读取数据至寄存器，或者，写寄存器数据到存储器，传送的数据长度通常是字长。</li>
+</ol>
+</li>
+</ol>
+<br />
+<br />如何确定每种类型的对齐边界？<br />
+<br />和平台有关<br />
+<br />go语言支持这些平台
+
+<table>
+<thead>
+<tr>
+<th>archName</th>
+<th>PtrSize(指针宽度)</th>
+<th>RegSize(寄存器宽度)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>386</td>
+<td>4</td>
+<td>8</td>
+</tr>
+<tr>
+<td>amd64</td>
+<td>8</td>
+<td>8</td>
+</tr>
+<tr>
+<td>arm</td>
+<td>4</td>
+<td>4</td>
+</tr>
+<tr>
+<td>arm64</td>
+<td>5</td>
+<td>8</td>
+</tr>
+<tr>
+<td>……</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p><br />被Go语言称为寄存器宽度的这个值，就可以理解为机器字长，也是平台对应的最大对齐边界，而数据类型的对齐边界是取类型大小与平台最大对齐边界中的较小的那个<br /></p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>大小</th>
+<th>RegSize</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>int8</td>
+<td>1 byte</td>
+<td>8 byte</td>
+</tr>
+<tr>
+<td>int16</td>
+<td>2 byte</td>
+<td>8 byte</td>
+</tr>
+<tr>
+<td>int32</td>
+<td>4 byte</td>
+<td>8 byte</td>
+</tr>
+<tr>
+<td>int64</td>
+<td>8 byte</td>
+<td>8 byte</td>
+</tr>
+<tr>
+<td>string</td>
+<td>16 byte</td>
+<td>8 byte</td>
+</tr>
+<tr>
+<td>slice</td>
+<td>24 byte</td>
+<td>8 byte</td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody></table>
+<p><br />同一个类型在不同平台上的大小可能不同，不按照最大对齐边界或者最小对齐边界来考虑是为了减少浪费、提高性能<br /><br><br />如何确定一个结构体的对齐边界<br /><br><br />先确定每个成员的对齐边界，然后取最大值<br /></p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> T stract &#123;</span><br><span class="line">    </span><br><span class="line">	a <span class="type">int8</span>     <span class="number">1</span> <span class="type">byte</span></span><br><span class="line">    b <span class="type">int64</span>    <span class="number">8</span> <span class="type">byte</span></span><br><span class="line">    c <span class="type">int32</span>    <span class="number">4</span> <span class="type">byte</span>     最大对齐  <span class="number">8</span> <span class="type">byte</span></span><br><span class="line">    d <span class="type">int16</span>    <span class="number">2</span> <span class="type">byte</span> </span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><br />内存对齐的第一个要求、存储这个结构体的起始地址是对齐边界的整数倍<br /><br><br /><br><br /><br><br /><img src="https://cdn.nlark.com/yuque/0/2020/png/203997/1605539978350-f73bfde3-25e7-4946-b8a6-6a8269117412.png#align=left&display=inline&height=379&margin=%5Bobject%20Object%5D&name=image.png&originHeight=379&originWidth=646&size=81183&status=done&style=none&width=646" alt="image.png"><br />第一个成员a,它要对齐到1字节，而这里是相对地址0，所以直接放这里，然后是第二个成员b,它要对齐到8字节，但是接下来的地址对8取模不等于0,所以要往后移。接下来是c，它要对齐到4字节。所有成员放好还不算完，内存对齐的第二个要求是结构体整体占用字节数需要是类型对齐边界的整数倍，不够的话要往后扩张。所以要扩充到相当地址23这里。最终这个结构体类型的大小就是24字节<br /><br><br />为啥要限制类型大小等于其对其边界的整数倍 ？<br /><br><br />假如不扩张到对齐边界的整数倍，这个结构体大小就是22字节，如果要使用长度为2的T类型数组，按照元素类型大小，会占用44字节，就会导致于第二个元素并没有内存对齐<br /><br><br /><img src="https://cdn.nlark.com/yuque/0/2020/png/203997/1605540679086-1d5177d5-4dd2-4d07-b7b1-84c898f76df4.png#align=left&display=inline&height=65&margin=%5Bobject%20Object%5D&name=image.png&originHeight=130&originWidth=998&size=24366&status=done&style=none&width=499" alt="image.png"><br /><br><br />所以只有每个结构体的大小是对齐值的整数倍，才能保证数组中的每一个都是内存对齐的<br /><br><br />内存对齐的第二个要求：结构体整体占用字节数需要是类型对齐边界的倍数，不够的话要往后扩张一下<br /><br><br />举个特例</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> T1 <span class="keyword">struct</span> &#123;</span><br><span class="line">    a <span class="keyword">struct</span>&#123;&#125;</span><br><span class="line">    x <span class="type">int64</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> T2 <span class="keyword">struct</span> &#123;</span><br><span class="line">	x <span class="type">int64</span></span><br><span class="line">    a <span class="keyword">struct</span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">a1 := T1&#123;&#125;</span><br><span class="line">a2 := T2&#123;&#125;</span><br><span class="line"></span><br><span class="line">fmt.Printf(<span class="string">&quot;zone size struct&#123;&#125; of T1 size:%d,Ts(as final field) size:%d&quot;</span>,</span><br><span class="line">           unfafe.Sizeof(a1), <span class="comment">// 8</span></span><br><span class="line">           unfafe.Sizeof(a2), <span class="comment">// 64位，16；32位：12</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p><br />T2可能做了一个Padding(填充)，因为在边界，可能会对一些边界的值进行引用等<br /><br><br />特殊：<br /><br><br /><code>struct&#123;&#125;</code> 和<code>[0]T&#123;&#125;</code> 的大小为0; 不同的大小为0的变量可能指向同一块地址。<br /><br><br /></p>
+<p><a name="CliP1"></a></p>
+<h3 id="零大小字段对齐"><a href="#零大小字段对齐" class="headerlink" title="零大小字段对齐"></a>零大小字段对齐</h3><p><br />零大小字段（<code>zero sized field</code>）是指<code>struct&#123;&#125;</code><br /><br><br />大小为0，按理作为字段时不需要对齐，但当在作为结构体最后一个字段（<code>final field</code>）时需要对齐的。<br />为什么？<br />因为，如果有指针指向这个<code>final zero field</code>, 返回的地址将在结构体之外（即指向了别的内存），<br />如果此指针一直存活不释放对应的内存，就会有内存泄露的问题（该内存不因结构体释放而释放）<br /><br><br /><br><br />使用  golangci-lint  检测对齐<br /><br><br />golangci-lint run –disable-all -E maligned<br /><br><br /></p>
+<p><a name="EEj7F"></a></p>
+<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><ul>
+<li>内存对齐是为了cpu更高效的访问内存中的数据</li>
+<li>结构体对齐依赖类型的大小保证和对齐保证</li>
+<li>地址对齐保证是:如果类型t的对齐保证是n，那么类型t的每个值的地址在运行时必须是n的倍数</li>
+<li>零大小字段要避免只作为struct最后一个字段，会有内存浪费</li>
+</ul>
+<br />
+<br />参考
+
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1Ja4y1i7AF">【Golang】这个内存对齐呀！？</a></li>
+<li><a target="_blank" rel="noopener" href="https://ms2008.github.io/2019/08/01/golang-memory-alignment/">Golang 是否有必要内存对齐？</a></li>
+<li><a target="_blank" rel="noopener" href="https://learnku.com/articles/39255">Go 的内存对齐和指针运算详解和实践</a></li>
+</ul>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://www.liangyouze.com/2020/08/11/%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/" data-id="clkikkygq001gdmnmclo135yi" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="https://www.liangyouze.com/2020/08/11/%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="https://www.liangyouze.com/2020/08/11/%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2021/01/01/2020%E5%B9%B4%E6%80%BB%E7%BB%93/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    2020年总结
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2020/07/11/go-map/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">深入理解go map</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2023/05/05/%E9%AB%98%E9%98%B6%E5%87%BD%E6%95%B0%E7%BC%96%E7%A8%8B%E6%8A%80%E5%B7%A7/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/%E5%87%BD%E6%95%B0/">函数</a></p>
+                            <p class="item-title"><a href="/2023/05/05/%E9%AB%98%E9%98%B6%E5%87%BD%E6%95%B0%E7%BC%96%E7%A8%8B%E6%8A%80%E5%B7%A7/" class="title">高阶函数编程技巧</a></p>
+                            <p class="item-date"><time datetime="2023-05-05T11:50:23.000Z" itemprop="datePublished">2023-05-05</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2022/06/05/golang%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/%E5%86%85%E5%AD%98%E9%80%83%E9%80%B8/">内存逃逸</a></p>
+                            <p class="item-title"><a href="/2022/06/05/golang%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/" class="title">golang逃逸分析</a></p>
+                            <p class="item-date"><time datetime="2022-06-05T11:50:23.000Z" itemprop="datePublished">2022-06-05</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2022/05/05/gin%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/gin/">gin</a></p>
+                            <p class="item-title"><a href="/2022/05/05/gin%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" class="title">gin源码阅读</a></p>
+                            <p class="item-date"><time datetime="2022-05-05T11:50:24.000Z" itemprop="datePublished">2022-05-05</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2022/04/05/%E7%94%B1%E4%B8%80%E8%A1%8C%E4%BB%A3%E7%A0%81%E5%BC%95%E5%8F%91%E7%9A%84%E5%8F%98%E9%87%8F%E5%88%86%E9%85%8D%E6%80%9D%E8%80%83/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/%E5%86%85%E5%AD%98%E9%80%83%E9%80%B8/">内存逃逸</a></p>
+                            <p class="item-title"><a href="/2022/04/05/%E7%94%B1%E4%B8%80%E8%A1%8C%E4%BB%A3%E7%A0%81%E5%BC%95%E5%8F%91%E7%9A%84%E5%8F%98%E9%87%8F%E5%88%86%E9%85%8D%E6%80%9D%E8%80%83/" class="title">由一行代码引发的变量分配思考</a></p>
+                            <p class="item-date"><time datetime="2022-04-05T11:50:23.000Z" itemprop="datePublished">2022-04-05</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2021/03/11/Golang%20Context%E5%8C%85%20%E8%AF%A6%E8%A7%A3/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/golang/">golang</a></p>
+                            <p class="item-title"><a href="/2021/03/11/Golang%20Context%E5%8C%85%20%E8%AF%A6%E8%A7%A3/" class="title">Golang Context包 详解</a></p>
+                            <p class="item-date"><time datetime="2021-03-11T07:10:23.000Z" itemprop="datePublished">2021-03-11</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL/">MySQL</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/gin/">gin</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/map/">map</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/vim/">vim</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%86%85%E5%AD%98%E9%80%83%E9%80%B8/">内存逃逸</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%87%BD%E6%95%B0/">函数</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%9D%82%E8%B0%88/">杂谈</a><span class="category-list-count">3</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">六月 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">五月 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">四月 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">二月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">八月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">七月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">一月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/" rel="tag">Docker</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/" rel="tag">MySQL</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/context/" rel="tag">context</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/" rel="tag">elasticsearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/" rel="tag">go</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/" rel="tag">golang</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iframe/" rel="tag">iframe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pprof/" rel="tag">pprof</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/" rel="tag">vim</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/" rel="tag">内存对齐</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" rel="tag">字符串</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9D%82%E8%B0%88/" rel="tag">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B4%A2%E5%BC%95/" rel="tag">索引</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%84%E5%88%99/" rel="tag">规则</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A2%E5%8D%95%E5%8F%B7/" rel="tag">订单号</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AF%BB%E4%B9%A6/" rel="tag">读书</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B7%A8%E5%9F%9F/" rel="tag">跨域</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/MySQL/" style="font-size: 17.5px;">MySQL</a> <a href="/tags/Python/" style="font-size: 10px;">Python</a> <a href="/tags/context/" style="font-size: 10px;">context</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/golang/" style="font-size: 15px;">golang</a> <a href="/tags/iframe/" style="font-size: 10px;">iframe</a> <a href="/tags/pprof/" style="font-size: 10px;">pprof</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/" style="font-size: 10px;">内存对齐</a> <a href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" style="font-size: 12.5px;">字符串</a> <a href="/tags/%E6%9D%82%E8%B0%88/" style="font-size: 15px;">杂谈</a> <a href="/tags/%E7%B4%A2%E5%BC%95/" style="font-size: 10px;">索引</a> <a href="/tags/%E8%A7%84%E5%88%99/" style="font-size: 10px;">规则</a> <a href="/tags/%E8%AE%A2%E5%8D%95%E5%8F%B7/" style="font-size: 10px;">订单号</a> <a href="/tags/%E8%AF%BB%E4%B9%A6/" style="font-size: 10px;">读书</a> <a href="/tags/%E8%B7%A8%E5%9F%9F/" style="font-size: 10px;">跨域</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a target="_blank" rel="noopener" href="http://www.liangyongrui.com">梁永锐</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+			<!--不蒜子统计-->
+           <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <span id="busuanzi_container_site_pv">本站总访问量:<span id="busuanzi_value_site_pv"></span>&nbsp;本站总访次数:<span id="busuanzi_value_site_uv"></span></span><br>
+		
+            &copy; 2023 梁友泽<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a target="_blank" rel="noopener" href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script>
+    var disqus_config = function () {
+        
+            this.page.url = 'https://www.liangyouze.com/2020/08/11/%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/';
+        
+        this.page.identifier = '内存对齐';
+    };
+    (function() { 
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'hexo-theme-icarus' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+
+
+
+    
+        
+<script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>
