@@ -5,15 +5,15 @@
     
     <title>Golang Context包 详解 | 梁友泽的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="context 主要用来在 goroutine 之间传递上下文信息，包括：取消信号、超时时间、截止时间、k-v 等。 context 用来解决 goroutine 之间退出通知、元数据传递的功能。 控制并发有两种经典的方式，一种是WaitGroup，另外一种就是Context Value函数并没有任何保证，编译器不会检查传进来的参数是否是合理。 Context 接口Context接口定义 1234">
+    <meta name="description" content="context 主要用来在 goroutine 之间传递上下文信息，包括：取消信号、超时时间、截止时间、k-v 等。 context 用来解决 goroutine 之间退出通知、元数据传递的功能。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Golang Context包 详解">
 <meta property="og:url" content="https://www.liangyouze.com/2021/03/11/Golang%20Context%E5%8C%85%20%E8%AF%A6%E8%A7%A3/index.html">
 <meta property="og:site_name" content="梁友泽的博客">
-<meta property="og:description" content="context 主要用来在 goroutine 之间传递上下文信息，包括：取消信号、超时时间、截止时间、k-v 等。 context 用来解决 goroutine 之间退出通知、元数据传递的功能。 控制并发有两种经典的方式，一种是WaitGroup，另外一种就是Context Value函数并没有任何保证，编译器不会检查传进来的参数是否是合理。 Context 接口Context接口定义 1234">
+<meta property="og:description" content="context 主要用来在 goroutine 之间传递上下文信息，包括：取消信号、超时时间、截止时间、k-v 等。 context 用来解决 goroutine 之间退出通知、元数据传递的功能。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-03-11T07:10:23.000Z">
-<meta property="article:modified_time" content="2023-07-25T17:19:40.688Z">
+<meta property="article:modified_time" content="2023-07-26T11:54:12.694Z">
 <meta property="article:author" content="梁友泽">
 <meta property="article:tag" content="context">
 <meta name="twitter:card" content="summary">
@@ -256,7 +256,7 @@
         
             
             <p>context 主要用来在 goroutine 之间传递上下文信息，包括：取消信号、超时时间、截止时间、k-v 等。</p>
-<p>context 用来解决 goroutine 之间<code>退出通知</code>、<code>元数据传递</code>的功能。</p>
+<p>context 用来解决 goroutine 之间<code>退出通知</code>、<code>元数据传递</code>的功能。   <span id="more"></span></p>
 <p>控制并发有两种经典的方式，一种是WaitGroup，另外一种就是Context</p>
 <p>Value函数并没有任何保证，编译器不会检查传进来的参数是否是合理。</p>
 <h2 id="Context-接口"><a href="#Context-接口" class="headerlink" title="Context 接口"></a>Context 接口</h2><p>Context接口定义</p>
