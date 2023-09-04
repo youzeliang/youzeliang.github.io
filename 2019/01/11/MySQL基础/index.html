@@ -3,15 +3,23 @@
 <head>
     <meta charset="utf-8">
     
-    <title>标签: 字符串 | 梁友泽的博客</title>
+    <title>MySQL基础 | 梁友泽的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta property="og:type" content="website">
-<meta property="og:title" content="梁友泽的博客">
-<meta property="og:url" content="https://www.liangyouze.com/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/index.html">
+    <meta name="description" content="基础知识 mysql默认的引擎是InnoDB(MySQL5.5.5版本起)  三大范式 属性具有原子性，不可再分解； 不存在部分依赖； 不存在传递依赖；  MySQL InnoDB 概览InnoDB的数据存储在表空间，表空间是由InnoDB管理的一个黑盒子,由一系列的数据文件组成。InnoDB采用MVCC来支持高并发 MySQL执行 Server 层包括连接器、查询缓存、分析器、优化器、执行器等，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL基础">
+<meta property="og:url" content="https://www.liangyouze.com/2019/01/11/MySQL%E5%9F%BA%E7%A1%80/index.html">
 <meta property="og:site_name" content="梁友泽的博客">
+<meta property="og:description" content="基础知识 mysql默认的引擎是InnoDB(MySQL5.5.5版本起)  三大范式 属性具有原子性，不可再分解； 不存在部分依赖； 不存在传递依赖；  MySQL InnoDB 概览InnoDB的数据存储在表空间，表空间是由InnoDB管理的一个黑盒子,由一系列的数据文件组成。InnoDB采用MVCC来支持高并发 MySQL执行 Server 层包括连接器、查询缓存、分析器、优化器、执行器等，">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.liangyouze.com/images/mysql%E6%89%A7%E8%A1%8C.png">
+<meta property="og:image" content="https://www.liangyouze.com/images/mysql%E6%9B%B4%E6%96%B0.png">
+<meta property="article:published_time" content="2019-01-11T07:10:23.000Z">
+<meta property="article:modified_time" content="2023-09-04T17:19:01.332Z">
 <meta property="article:author" content="梁友泽">
+<meta property="article:tag" content="MySQL">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.liangyouze.com/images/mysql%E6%89%A7%E8%A1%8C.png">
     
 
     
@@ -207,81 +215,211 @@
 </aside>
 
             
-            <section id="main">
-<div class="timeline timeline-wrap">
-    <div class="timeline-row timeline-row-major">
-        <span class="node"><i class="fa fa-tag"></i></span>
-        <h1 class="title">#字符串</h1>
-    </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
+            <section id="main"><article id="post-MySQL基础" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
                 
     
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2018/04/01/golang%20%E4%B8%AD%E8%8E%B7%E5%8F%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%AA%E6%95%B0/">golang 中获取字符串个数</a>
+        <h1 class="article-title" itemprop="name">
+            MySQL基础
         </h1>
     
 
-                <div class="article-meta">
-                    
+                
+                    <div class="article-meta">
+                        
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2018/04/01/golang%20%E4%B8%AD%E8%8E%B7%E5%8F%96%E5%AD%97%E7%AC%A6%E4%B8%B2%E4%B8%AA%E6%95%B0/">
-            <time datetime="2018-04-01T06:10:23.000Z" itemprop="datePublished">2018-04-01</time>
+        <a href="/2019/01/11/MySQL%E5%9F%BA%E7%A1%80/">
+            <time datetime="2019-01-11T07:10:23.000Z" itemprop="datePublished">2019-01-11</time>
         </a>
     </div>
 
 
-                    
+                        
     <div class="article-category">
     	<i class="fa fa-folder"></i>
-        <a class="article-category-link" href="/categories/golang/">golang</a>
+        <a class="article-category-link" href="/categories/MySQL/">MySQL</a>
     </div>
 
-                    
+                        
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link-link" href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" rel="tag">字符串</a>
+        <a class="tag-link-link" href="/tags/MySQL/" rel="tag">MySQL</a>
     </div>
 
-                </div>
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
+                    </div>
                 
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2017/11/23/String%E3%80%81StringBuffer%E3%80%81StringBuilder%E4%B8%89%E8%80%85%E4%B9%8B%E9%97%B4%E7%9A%84%E5%8C%BA%E5%88%AB/">String、StringBuffer、StringBuilder三者之间的区别</a>
-        </h1>
-    
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><ul>
+<li>mysql默认的引擎是InnoDB(MySQL5.5.5版本起)</li>
+</ul>
+<h3 id="三大范式"><a href="#三大范式" class="headerlink" title="三大范式"></a>三大范式</h3><ul>
+<li>属性具有原子性，不可再分解；</li>
+<li>不存在部分依赖；</li>
+<li>不存在传递依赖；</li>
+</ul>
+<h3 id="MySQL-InnoDB-概览"><a href="#MySQL-InnoDB-概览" class="headerlink" title="MySQL InnoDB 概览"></a>MySQL InnoDB 概览</h3><p>InnoDB的数据存储在表空间，表空间是由InnoDB管理的一个黑盒子,由一系列的数据文件组成。InnoDB采用MVCC来支持高并发</p>
+<h3 id="MySQL执行"><a href="#MySQL执行" class="headerlink" title="MySQL执行"></a>MySQL执行</h3><p><img src="/images/mysql%E6%89%A7%E8%A1%8C.png" alt="mysql.png"></p>
+<p>Server 层包括连接器、查询缓存、分析器、优化器、执行器等，涵盖 MySQL 的大多数核心服务功能，以及所有的内置函数（如日期、时间等），所有跨存储引擎的功能都在这一层实现，比如存储过程、触发器、视图等。</p>
+<ul>
+<li>连接器<ul>
+<li>先连接上数据库，这个时候接待的就是连接器，连接器负责根客户端建立连接，获取权限，维持和管理连接</li>
+</ul>
+</li>
+<li>查询缓存<ul>
+<li>MySQL拿到一个查询请求后，会先到查询缓存看看，之前是不是执行过这条语句。之前执行过的语句及其结果可能会以 key-value 对的形式，被直接缓存在内存中。key 是查询的语句，value 是查询的结果。如果你的查询能够直接在这个缓存中找到 key，那么这个 value 就会被直接返回给客户端。</li>
+<li>可以将参数 query_cache_type 设置成 DEMAND，这样对于默认的 SQL 语句都不使用查询缓存。(MySQL8.0没有查询缓存)</li>
+</ul>
+</li>
+<li>分析器<ul>
+<li>分析语法是否正确</li>
+</ul>
+</li>
+<li>优化器<ul>
+<li>优化器是在表里面有多个索引的时候，决定使用哪个索引；或者在一个语句有多表关联（join）的时候，决定各个表的连接顺序。比如你执行下面这样的语句，这个语句是执行两个表的 join：</li>
+<li>select * from t1 join t2 using(ID) where t1.c&#x3D;10 and t2.d&#x3D;20;</li>
+<li>既可以先从表 t1 里面取出 c&#x3D;10 的记录的 ID 值，再根据 ID 值关联到表 t2，再判断 t2 里面 d 的值是否等于 20。</li>
+<li>也可以先从表 t2 里面取出 d&#x3D;20 的记录的 ID 值，再根据 ID 值关联到 t1，再判断 t1 里面 c 的值是否等于 10。</li>
+</ul>
+</li>
+<li>执行器<ul>
+<li>如检查权限等，执行SQL</li>
+</ul>
+</li>
+</ul>
+<p><strong>IO成本</strong></p>
+<p>IO成本就是寻址时间和上线文切换所需要的时间，最主要是用户态和内核态的上下文切换。用户态是无法直接访问磁盘等硬件上的数据的，只能通过操作系统去调内核态的接口，用内核态的线程去访问。 这里的上下文切换指的是同进程的线程上下文切换，所谓上下文就是线程运行需要的环境信息。首先，用户态线程需要一些中间计算结果保存CPU寄存器，保存CPU指令的地址到程序计数器（执行顺序保证），还要保存栈的信息等一些线程私有的信息。 然后切换到内核态的线程执行，就需要把线程的私有信息从寄存器，程序计数器里读出来，然后执行读磁盘上的数据。读完后返回，又要把线程的信息写进寄存器和程序计数器。 切换到用户态后，用户态线程又要读之前保存的线程执行的环境信息出来，恢复执行。这个过程主要是消耗时间资源。</p>
+<h3 id="MySQL更新"><a href="#MySQL更新" class="headerlink" title="MySQL更新"></a>MySQL更新</h3><p>当有一条记录需要更新的时候，InnoDB 引擎就会先把记录写到 redo log里面，并更新内存，这个时候更新就算完成了。同时，InnoDB 引擎会在适当的时候，将这个操作记录更新到磁盘里面，而这个更新往往是在系统比较空闲的时候做</p>
+<p><img src="/images/mysql%E6%9B%B4%E6%96%B0.png" alt="mysql.png"></p>
+<p>分析SQL</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">set @@profiling=1;</span><br><span class="line">select ....</span><br><span class="line">show profiles;</span><br></pre></td></tr></table></figure>
+<p>查看当前会话所产生的所有 profiles的耗时</p>
 
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2017/11/23/String%E3%80%81StringBuffer%E3%80%81StringBuilder%E4%B8%89%E8%80%85%E4%B9%8B%E9%97%B4%E7%9A%84%E5%8C%BA%E5%88%AB/">
-            <time datetime="2017-11-23T14:38:31.000Z" itemprop="datePublished">2017-11-23</time>
-        </a>
-    </div>
-
-
-                    
-                    
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link-link" href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" rel="tag">字符串</a>
-    </div>
-
-                </div>
-            </div>
+        
         </div>
-    
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
 </div>
+
+    <a data-url="https://www.liangyouze.com/2019/01/11/MySQL%E5%9F%BA%E7%A1%80/" data-id="clm55cb750000ytnm315y44au" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="https://www.liangyouze.com/2019/01/11/MySQL%E5%9F%BA%E7%A1%80/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="https://www.liangyouze.com/2019/01/11/MySQL%E5%9F%BA%E7%A1%80/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2019/06/01/vim%20%E6%8A%80%E5%B7%A7/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    vim技巧
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2019/01/11/defer/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">golang-defer</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</section>
+    
+
 </section>
             
                 
@@ -467,11 +605,13 @@
     <script>
     var disqus_config = function () {
         
-        this.page.identifier = '';
+            this.page.url = 'https://www.liangyouze.com/2019/01/11/MySQL%E5%9F%BA%E7%A1%80/';
+        
+        this.page.identifier = 'MySQL基础';
     };
     (function() { 
         var d = document, s = d.createElement('script');  
-        s.src = '//' + 'hexo-theme-icarus' + '.disqus.com/count.js';
+        s.src = '//' + 'hexo-theme-icarus' + '.disqus.com/embed.js';
         s.setAttribute('data-timestamp', +new Date());
         (d.head || d.body).appendChild(s);
     })();
