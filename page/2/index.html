@@ -1462,8 +1462,7 @@
         
         <div class="article-entry" itemprop="articleBody">
         
-            
-            <h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><ul>
+            <p><h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><ul>
 <li>mysql默认的引擎是InnoDB(MySQL5.5.5版本起)</li>
 </ul>
 <h3 id="三大范式"><a href="#三大范式" class="headerlink" title="三大范式"></a>三大范式</h3><ul>
@@ -1474,40 +1473,9 @@
 <h3 id="MySQL-InnoDB-概览"><a href="#MySQL-InnoDB-概览" class="headerlink" title="MySQL InnoDB 概览"></a>MySQL InnoDB 概览</h3><p>InnoDB的数据存储在表空间，表空间是由InnoDB管理的一个黑盒子,由一系列的数据文件组成。InnoDB采用MVCC来支持高并发</p>
 <h3 id="MySQL执行"><a href="#MySQL执行" class="headerlink" title="MySQL执行"></a>MySQL执行</h3><p><img src="/images/mysql%E6%89%A7%E8%A1%8C.png" alt="mysql.png"></p>
 <p>Server 层包括连接器、查询缓存、分析器、优化器、执行器等，涵盖 MySQL 的大多数核心服务功能，以及所有的内置函数（如日期、时间等），所有跨存储引擎的功能都在这一层实现，比如存储过程、触发器、视图等。</p>
-<ul>
-<li>连接器<ul>
-<li>先连接上数据库，这个时候接待的就是连接器，连接器负责根客户端建立连接，获取权限，维持和管理连接</li>
-</ul>
-</li>
-<li>查询缓存<ul>
-<li>MySQL拿到一个查询请求后，会先到查询缓存看看，之前是不是执行过这条语句。之前执行过的语句及其结果可能会以 key-value 对的形式，被直接缓存在内存中。key 是查询的语句，value 是查询的结果。如果你的查询能够直接在这个缓存中找到 key，那么这个 value 就会被直接返回给客户端。</li>
-<li>可以将参数 query_cache_type 设置成 DEMAND，这样对于默认的 SQL 语句都不使用查询缓存。(MySQL8.0没有查询缓存)</li>
-</ul>
-</li>
-<li>分析器<ul>
-<li>分析语法是否正确</li>
-</ul>
-</li>
-<li>优化器<ul>
-<li>优化器是在表里面有多个索引的时候，决定使用哪个索引；或者在一个语句有多表关联（join）的时候，决定各个表的连接顺序。比如你执行下面这样的语句，这个语句是执行两个表的 join：</li>
-<li>select * from t1 join t2 using(ID) where t1.c&#x3D;10 and t2.d&#x3D;20;</li>
-<li>既可以先从表 t1 里面取出 c&#x3D;10 的记录的 ID 值，再根据 ID 值关联到表 t2，再判断 t2 里面 d 的值是否等于 20。</li>
-<li>也可以先从表 t2 里面取出 d&#x3D;20 的记录的 ID 值，再根据 ID 值关联到 t1，再判断 t1 里面 c 的值是否等于 10。</li>
-</ul>
-</li>
-<li>执行器<ul>
-<li>如检查权限等，执行SQL</li>
-</ul>
-</li>
-</ul>
-<p><strong>IO成本</strong></p>
-<p>IO成本就是寻址时间和上线文切换所需要的时间，最主要是用户态和内核态的上下文切换。用户态是无法直接访问磁盘等硬件上的数据的，只能通过操作系统去调内核态的接口，用内核态的线程去访问。 这里的上下文切换指的是同进程的线程上下文切换，所谓上下文就是线程运行需要的环境信息。首先，用户态线程需要一些中间计算结果保存CPU寄存器，保存CPU指令的地址到程序计数器（执行顺序保证），还要保存栈的信息等一些线程私有的信息。 然后切换到内核态的线程执行，就需要把线程的私有信息从寄存器，程序计数器里读出来，然后执行读磁盘上的数据。读完后返回，又要把线程的信息写进寄存器和程序计数器。 切换到用户态后，用户态线程又要读之前保存的线程执行的环境信息出来，恢复执行。这个过程主要是消耗时间资源。</p>
-<h3 id="MySQL更新"><a href="#MySQL更新" class="headerlink" title="MySQL更新"></a>MySQL更新</h3><p>当有一条记录需要更新的时候，InnoDB 引擎就会先把记录写到 redo log里面，并更新内存，这个时候更新就算完成了。同时，InnoDB 引擎会在适当的时候，将这个操作记录更新到磁盘里面，而这个更新往往是在系统比较空闲的时候做</p>
-<p><img src="/images/mysql%E6%9B%B4%E6%96%B0.png" alt="mysql.png"></p>
-<p>分析SQL</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">set @@profiling=1;</span><br><span class="line">select ....</span><br><span class="line">show profiles;</span><br></pre></td></tr></table></figure>
-<p>查看当前会话所产生的所有 profiles的耗时</p>
-
+            <p class="article-more-link">
+                <a href="/2019/01/11/MySQL%E5%9F%BA%E7%A1%80/#more">查看更多</a>
+            </p>
         
         </div>
         <footer class="article-footer">
