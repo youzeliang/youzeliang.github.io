@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>go panic探索 | 梁友泽的博客</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="panic 发生之后，如果 Go 不做任何特殊处理，默认行为是打印堆栈，退出程序。 panic 到底是什么？  panic( ) 函数内部会产生一个关键的数据结构体 _panic ，并且挂接到 goroutine 之上； panic( ) 函数内部会执行 _defer 函数链条，并针对 _panic 的状态进行对应的处理；">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go panic探索">
+<meta property="og:url" content="https://www.liangyouze.com/2021/09/20/%20go%20panic%E6%8E%A2%E7%B4%A2/index.html">
+<meta property="og:site_name" content="梁友泽的博客">
+<meta property="og:description" content="panic 发生之后，如果 Go 不做任何特殊处理，默认行为是打印堆栈，退出程序。 panic 到底是什么？  panic( ) 函数内部会产生一个关键的数据结构体 _panic ，并且挂接到 goroutine 之上； panic( ) 函数内部会执行 _defer 函数链条，并针对 _panic 的状态进行对应的处理；">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-09-20T06:10:23.000Z">
+<meta property="article:modified_time" content="2023-11-11T16:52:03.709Z">
+<meta property="article:author" content="梁友泽">
+<meta property="article:tag" content="go">
+<meta name="twitter:card" content="summary">
+    
+
+    
+
+    
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/libs/open-sans/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+<script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+    
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">梁友泽的博客</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives/">分类</a>
+                
+                    <a class="main-nav-link" href="/categories/">归档</a>
+                
+                    <a class="main-nav-link" href="/about">关于</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/rolle.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives/">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories/">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile" class="profile-fixed">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/rolle.png" />
+            <h2 id="name">梁友泽</h2>
+            <h3 id="title">Developer</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>BeiJing, China</span>
+            <a id="follow" target="_blank" href="https://github.com/youzeliang">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                34
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                19
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/youzeliang" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/i@liangyouze.com" target="_blank" title="email" class=tooltip>
+                            <i class="fa fa-email"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/css/images/rolle_wechat.jpg" target="_blank" title="wechat" class=tooltip>
+                            <i class="fa fa-wechat"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post- go panic探索" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            go panic探索
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2021/09/20/%20go%20panic%E6%8E%A2%E7%B4%A2/">
+            <time datetime="2021-09-20T06:10:23.000Z" itemprop="datePublished">2021-09-20</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/panic/">panic</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/go/" rel="tag">go</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>panic 发生之后，如果 Go 不做任何特殊处理，默认行为是打印堆栈，退出程序。</p>
+<p>panic 到底是什么？</p>
+<ol>
+<li>panic( ) 函数内部会产生一个关键的数据结构体 _panic ，并且挂接到 goroutine 之上；</li>
+<li>panic( ) 函数内部会执行 _defer 函数链条，并针对 _panic 的状态进行对应的处理； <span id="more"></span></li>
+</ol>
+<p>什么叫做 panic( ) 的对应的处理？</p>
+<p>循环执行 goroutine 上面的 _defer 函数链，如果执行完了都还没有恢复 _panic 的状态，那就没得办法了，退出进程，打印堆栈。<br>如果在 goroutine 的 _defer 链上，有个朋友 recover 了一下，把这个 _panic 标记成恢复，那事情就到此为止，就从这个 _defer 函数执行后续正常代码即可，走 deferreturn 的逻辑。</p>
+<p>recover 函数</p>
+<p>recover 对应了 runtime&#x2F;panic.go 中的 gorecover 函数实现。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">gorecover</span><span class="params">(argp <span class="type">uintptr</span>)</span></span> <span class="keyword">interface</span>&#123;&#125; &#123;</span><br><span class="line">    <span class="comment">// 只处理 gp._panic 链表最新的这个 _panic；</span></span><br><span class="line">    gp := getg()</span><br><span class="line">    p := gp._panic</span><br><span class="line">    <span class="keyword">if</span> p != <span class="literal">nil</span> &amp;&amp; !p.recovered &amp;&amp; argp == <span class="type">uintptr</span>(p.argp) &#123;</span><br><span class="line">        p.recovered = <span class="literal">true</span></span><br><span class="line">        <span class="keyword">return</span> p.arg</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个函数可太简单了：</p>
+<ol>
+<li>取出当前 goroutine 结构体；</li>
+<li>取出当前 goroutine 的 _panic 链表最新的一个 _panic，如果是非 nil 值，则进行处理；</li>
+<li>该 _panic 结构体的 recovered 赋值 true，程序返回；</li>
+</ol>
+<p>这就是 recover 函数的全部内容，只给 _panic.recovered 赋值而已，不涉及代码的神奇跳转。而 _panic.recovered 的赋值是在 panic 函数逻辑中发挥作用。</p>
+<p>panic函数</p>
+<p>panic 的实现在一个叫做 gopanic 的函数，位于 runtime&#x2F;panic.go 文件。panic 机制最重要最重要的就是 gopanic 函数了，所有的 panic 细节尽在此。为什么 panic 会显得晦涩，主要有两个点：</p>
+<ol>
+<li>嵌套 panic 的时候，gopanic 会有递归执行的场景；</li>
+<li>程序指令跳转并不是常规的函数压栈，弹栈，在 recovery 的时候，是直接修改指令寄存器的结构体，从而直接越过了 gopanic 后面的逻辑，甚至是多层 gopanic 递归的逻辑；</li>
+</ol>
+<p>一切秘密都在下面这个函数：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// runtime/panic.go</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">gopanic</span><span class="params">(e <span class="keyword">interface</span>&#123;&#125;)</span></span> &#123;</span><br><span class="line">    <span class="comment">// 在栈上分配一个 _panic 结构体</span></span><br><span class="line">    <span class="keyword">var</span> p _panic</span><br><span class="line">    <span class="comment">// 把当前最新的 _panic 挂到链表最前面</span></span><br><span class="line">    p.link = gp._panic</span><br><span class="line">    gp._panic = (*_panic)(noescape(unsafe.Pointer(&amp;p)))</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> &#123;</span><br><span class="line">        <span class="comment">// 取出当前最近的 defer 函数；</span></span><br><span class="line">        d := gp._defer</span><br><span class="line">        <span class="keyword">if</span> d == <span class="literal">nil</span> &#123;</span><br><span class="line">            <span class="comment">// 如果没有 defer ，那就没有 recover 的时机，只能跳到循环外，退出进程了；</span></span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 进到这个逻辑，那说明了之前是有 panic 了，现在又有 panic 发生，这里一定处于递归之中；</span></span><br><span class="line">        <span class="keyword">if</span> d.started &#123;</span><br><span class="line">            <span class="keyword">if</span> d._panic != <span class="literal">nil</span> &#123;</span><br><span class="line">                d._panic.aborted = <span class="literal">true</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 把这个 defer 从链表中摘掉；</span></span><br><span class="line">            gp._defer = d.link</span><br><span class="line">            freedefer(d)</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 标记 _defer 为 started = true （panic 递归的时候有用）</span></span><br><span class="line">        d.started = <span class="literal">true</span></span><br><span class="line">        <span class="comment">// 记录当前 _defer 对应的 panic</span></span><br><span class="line">        d._panic = (*_panic)(noescape(unsafe.Pointer(&amp;p)))</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 执行 defer 函数</span></span><br><span class="line">        reflectcall(<span class="literal">nil</span>, unsafe.Pointer(d.fn), deferArgs(d), <span class="type">uint32</span>(d.siz), <span class="type">uint32</span>(d.siz))</span><br><span class="line"></span><br><span class="line">        <span class="comment">// defer 执行完成，把这个 defer 从链表里摘掉；</span></span><br><span class="line">        gp._defer = d.link</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 取出 pc，sp 寄存器的值；</span></span><br><span class="line">        pc := d.pc</span><br><span class="line">        sp := unsafe.Pointer(d.sp)</span><br><span class="line">        <span class="comment">// 如果 _panic 被设置成恢复，那么到此为止；</span></span><br><span class="line">        <span class="keyword">if</span> p.recovered &#123;</span><br><span class="line">            <span class="comment">// 摘掉当前的 _panic</span></span><br><span class="line">            gp._panic = p.link</span><br><span class="line">            <span class="comment">// 如果前面还有 panic，并且是标记了 aborted 的，那么也摘掉；</span></span><br><span class="line">            <span class="keyword">for</span> gp._panic != <span class="literal">nil</span> &amp;&amp; gp._panic.aborted &#123;</span><br><span class="line">                gp._panic = gp._panic.link</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// panic 的流程到此为止，恢复到业务函数堆栈上执行代码；</span></span><br><span class="line">            gp.sigcode0 = <span class="type">uintptr</span>(sp)</span><br><span class="line">            gp.sigcode1 = pc</span><br><span class="line">            <span class="comment">// 注意：恢复的时候 panic 函数将从此处跳出，本 gopanic 调用结束，后面的代码永远都不会执行。</span></span><br><span class="line">            mcall(recovery)</span><br><span class="line">            throw(<span class="string">&quot;recovery failed&quot;</span>) <span class="comment">// mcall should not return</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印错误信息和堆栈，并且退出进程；</span></span><br><span class="line">    preprintpanics(gp._panic)</span><br><span class="line">    fatalpanic(gp._panic) <span class="comment">// should not return</span></span><br><span class="line">    *(*<span class="type">int</span>)(<span class="literal">nil</span>) = <span class="number">0</span>      <span class="comment">// not reached</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面逻辑可以拆分为循环内和循环外两部分去理解：</p>
+<ul>
+<li>循环内：程序执行 defer，是否恢复正常的指令执行，一切都在循环内决定；</li>
+<li>循环外：一旦走到循环外，说明 _panic 没人处理，程序即将退出；</li>
+</ul>
+<p>for 循环内</p>
+<p>循环内的事情拆解成：</p>
+<ol>
+<li>遍历 goroutine 的 defer 链表，获取到一个 _defer 延迟函数；</li>
+<li>获取到 _defer 延迟函数，设置标识 d.started，绑定当前 d._panic（用以在递归的时候判断）；</li>
+<li>执行 _defer 延迟函数；</li>
+<li>摘掉执行完的 _defer 函数；</li>
+<li>判断 _panic.recovered 是否设置为 true，进行相应操作；<ol>
+<li>如果是 true 那么重置 pc，sp 寄存器（一般从 deferreturn 指令前开始执行），goroutine 投递到调度队列，等待执行；</li>
+</ol>
+</li>
+<li>重复以上步骤；</li>
+</ol>
+<p>问题一：为什么 recover 一定要放在 defer 里面才生效？</p>
+<p>因为，这是唯一的修改 _panic.recovered 字段的时机 ！</p>
+<p>为什么 recover 已经放在 defer 里面，但是进程还是没有恢复？</p>
+<p>划重点：在 gopanic 里，只遍历执行当前 goroutine 上的 _defer 函数链条。所以，如果挂在其他 goroutine 的 defer 函数做了 recover ，那么没有丝毫用途。</p>
+<p>例</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123; <span class="comment">// g1</span></span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123; <span class="comment">// g2</span></span><br><span class="line">        <span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">            <span class="built_in">recover</span>()</span><br><span class="line">        &#125;()</span><br><span class="line">    &#125;()</span><br><span class="line">    <span class="built_in">panic</span>(<span class="string">&quot;test&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>因为，panic 和 recover  在两个不同的 goroutine，_panic 是挂在 g1 上的，recover 是在 g2 的 _defer 链条里。<br>gopanic 遍历的是 g1 的 _defer 函数链表，跟 g2 八杆子打不着，g2 的 recover 自然拿不到 g1 的 _panic 结构，自然也不能设置 recovered 为 true ，所以程序还是崩了。</p>
+<p>recover  函数<br>在 gopanic 函数中，在循环执行 defer 函数的时候，如果发现 _panic.recovered 字段被设置成 true 的时候，调用 mcall(recovery) 来执行所谓的恢复。</p>
+<p>看一眼 recovery 函数的实现，这个函数极其简单，就是恢复 pc，sp 寄存器，重新把 Goroutine 投递到调度队列中。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// runtime/panic.go</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">recovery</span><span class="params">(gp *g)</span></span> &#123;</span><br><span class="line">    <span class="comment">// 取出栈寄存器和程序计数器的值</span></span><br><span class="line">    sp := gp.sigcode0</span><br><span class="line">    pc := gp.sigcode1</span><br><span class="line">    <span class="comment">// 重置 goroutine 的 pc，sp 寄存器；</span></span><br><span class="line">    gp.sched.sp = sp</span><br><span class="line">    gp.sched.pc = pc</span><br><span class="line">    <span class="comment">// 重新投入调度队列</span></span><br><span class="line">    gogo(&amp;gp.sched)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>总结</p>
+<ol>
+<li>panic() 会退出进程，是因为调用了 exit 的系统调用；</li>
+<li>recover() 所在的 defer 函数必须和 panic 都是挂在同一个goroutine 上，不能跨协程，因为 gopanic 只会执行当前 goroutine 的延迟函数；</li>
+</ol>
+<p>参考<br><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/pxWf762ODDkcYO-xCGMm2g">深度细节 | Go 的 panic 的秘密都在这</a><br><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzkyNzI1NzM5NQ==&mid=2247484780&idx=1&sn=0468a1a4dc27c09732804798e5609def&source=41#wechat_redirect">源码剖析panic与recover</a></p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://www.liangyouze.com/2021/09/20/%20go%20panic%E6%8E%A2%E7%B4%A2/" data-id="clouabadk0000nrnm18w189w7" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="https://www.liangyouze.com/2021/09/20/%20go%20panic%E6%8E%A2%E7%B4%A2/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="https://www.liangyouze.com/2021/09/20/%20go%20panic%E6%8E%A2%E7%B4%A2/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2022/04/05/%E7%94%B1%E4%B8%80%E8%A1%8C%E4%BB%A3%E7%A0%81%E5%BC%95%E5%8F%91%E7%9A%84%E5%8F%98%E9%87%8F%E5%88%86%E9%85%8D%E6%80%9D%E8%80%83/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    由一行代码引发的变量分配思考
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2021/03/11/Golang%20Context%E5%8C%85%20%E8%AF%A6%E8%A7%A3/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">Golang Context包 详解</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2023/05/05/%E9%AB%98%E9%98%B6%E5%87%BD%E6%95%B0%E7%BC%96%E7%A8%8B%E6%8A%80%E5%B7%A7/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/%E5%87%BD%E6%95%B0/">函数</a></p>
+                            <p class="item-title"><a href="/2023/05/05/%E9%AB%98%E9%98%B6%E5%87%BD%E6%95%B0%E7%BC%96%E7%A8%8B%E6%8A%80%E5%B7%A7/" class="title">高阶函数编程技巧</a></p>
+                            <p class="item-date"><time datetime="2023-05-05T11:50:23.000Z" itemprop="datePublished">2023-05-05</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2022/06/05/golang%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/%E5%86%85%E5%AD%98%E9%80%83%E9%80%B8/">内存逃逸</a></p>
+                            <p class="item-title"><a href="/2022/06/05/golang%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/" class="title">golang逃逸分析</a></p>
+                            <p class="item-date"><time datetime="2022-06-05T11:50:23.000Z" itemprop="datePublished">2022-06-05</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2022/05/05/gin%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/gin/">gin</a></p>
+                            <p class="item-title"><a href="/2022/05/05/gin%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" class="title">gin源码阅读</a></p>
+                            <p class="item-date"><time datetime="2022-05-05T11:50:24.000Z" itemprop="datePublished">2022-05-05</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2022/04/05/%E7%94%B1%E4%B8%80%E8%A1%8C%E4%BB%A3%E7%A0%81%E5%BC%95%E5%8F%91%E7%9A%84%E5%8F%98%E9%87%8F%E5%88%86%E9%85%8D%E6%80%9D%E8%80%83/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/%E5%86%85%E5%AD%98%E9%80%83%E9%80%B8/">内存逃逸</a></p>
+                            <p class="item-title"><a href="/2022/04/05/%E7%94%B1%E4%B8%80%E8%A1%8C%E4%BB%A3%E7%A0%81%E5%BC%95%E5%8F%91%E7%9A%84%E5%8F%98%E9%87%8F%E5%88%86%E9%85%8D%E6%80%9D%E8%80%83/" class="title">由一行代码引发的变量分配思考</a></p>
+                            <p class="item-date"><time datetime="2022-04-05T11:50:23.000Z" itemprop="datePublished">2022-04-05</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2021/09/20/%20go%20panic%E6%8E%A2%E7%B4%A2/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/panic/">panic</a></p>
+                            <p class="item-title"><a href="/2021/09/20/%20go%20panic%E6%8E%A2%E7%B4%A2/" class="title">go panic探索</a></p>
+                            <p class="item-date"><time datetime="2021-09-20T06:10:23.000Z" itemprop="datePublished">2021-09-20</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL/">MySQL</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/gin/">gin</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/kafka/">kafka</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/map/">map</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/panic/">panic</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/string/">string</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/vim/">vim</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%86%85%E5%AD%98%E9%80%83%E9%80%B8/">内存逃逸</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%87%BD%E6%95%B0/">函数</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%8F%8D%E5%B0%84/">反射</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%9D%82%E8%B0%88/">杂谈</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%A7%84%E8%8C%83/">规范</a><span class="category-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">六月 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">五月 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">四月 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/09/">九月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">二月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">十月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">八月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">七月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">一月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/" rel="tag">Docker</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/" rel="tag">MySQL</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/context/" rel="tag">context</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/" rel="tag">elasticsearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/" rel="tag">go</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/" rel="tag">golang</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iframe/" rel="tag">iframe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/" rel="tag">kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pprof/" rel="tag">pprof</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/" rel="tag">vim</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/" rel="tag">内存对齐</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" rel="tag">字符串</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9D%82%E8%B0%88/" rel="tag">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B4%A2%E5%BC%95/" rel="tag">索引</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%84%E5%88%99/" rel="tag">规则</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A2%E5%8D%95%E5%8F%B7/" rel="tag">订单号</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AF%BB%E4%B9%A6/" rel="tag">读书</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B7%A8%E5%9F%9F/" rel="tag">跨域</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/MySQL/" style="font-size: 17.5px;">MySQL</a> <a href="/tags/Python/" style="font-size: 10px;">Python</a> <a href="/tags/context/" style="font-size: 10px;">context</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/golang/" style="font-size: 15px;">golang</a> <a href="/tags/iframe/" style="font-size: 10px;">iframe</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/pprof/" style="font-size: 10px;">pprof</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/" style="font-size: 10px;">内存对齐</a> <a href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" style="font-size: 12.5px;">字符串</a> <a href="/tags/%E6%9D%82%E8%B0%88/" style="font-size: 15px;">杂谈</a> <a href="/tags/%E7%B4%A2%E5%BC%95/" style="font-size: 10px;">索引</a> <a href="/tags/%E8%A7%84%E5%88%99/" style="font-size: 10px;">规则</a> <a href="/tags/%E8%AE%A2%E5%8D%95%E5%8F%B7/" style="font-size: 10px;">订单号</a> <a href="/tags/%E8%AF%BB%E4%B9%A6/" style="font-size: 10px;">读书</a> <a href="/tags/%E8%B7%A8%E5%9F%9F/" style="font-size: 10px;">跨域</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a target="_blank" rel="noopener" href="http://www.liangyongrui.com">梁永锐</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+			<!--不蒜子统计-->
+           <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <span id="busuanzi_container_site_pv">本站总访问量:<span id="busuanzi_value_site_pv"></span>&nbsp;本站总访次数:<span id="busuanzi_value_site_uv"></span></span><br>
+		
+            &copy; 2023 梁友泽<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a target="_blank" rel="noopener" href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script>
+    var disqus_config = function () {
+        
+            this.page.url = 'https://www.liangyouze.com/2021/09/20/%20go%20panic%E6%8E%A2%E7%B4%A2/';
+        
+        this.page.identifier = ' go panic探索';
+    };
+    (function() { 
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'hexo-theme-icarus' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+
+
+
+    
+        
+<script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>
