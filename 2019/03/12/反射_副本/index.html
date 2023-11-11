@@ -3,14 +3,19 @@
 <head>
     <meta charset="utf-8">
     
-    <title>标签: 杂谈 | 梁友泽的博客</title>
+    <title>go规范 | 梁友泽的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta property="og:type" content="website">
-<meta property="og:title" content="梁友泽的博客">
-<meta property="og:url" content="https://www.liangyouze.com/tags/%E6%9D%82%E8%B0%88/index.html">
+    <meta name="description" content="1 . 多个 if 语句可以折叠成 switch123456789101112131415161718&#x2F;&#x2F; NOT BADif foo() &amp;#123;    &#x2F;&#x2F; ...&amp;#125; else if bar &#x3D;&#x3D; baz &amp;#123;    &#x2F;&#x2F; ...&amp;#125; else &amp;#123;    &#x2F;&#x2F; ...&amp;#125;&#x2F;&#x2F; BETTERswitch &amp;#123;case foo():    &#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go规范">
+<meta property="og:url" content="https://www.liangyouze.com/2019/03/12/%E5%8F%8D%E5%B0%84_%E5%89%AF%E6%9C%AC/index.html">
 <meta property="og:site_name" content="梁友泽的博客">
+<meta property="og:description" content="1 . 多个 if 语句可以折叠成 switch123456789101112131415161718&#x2F;&#x2F; NOT BADif foo() &amp;#123;    &#x2F;&#x2F; ...&amp;#125; else if bar &#x3D;&#x3D; baz &amp;#123;    &#x2F;&#x2F; ...&amp;#125; else &amp;#123;    &#x2F;&#x2F; ...&amp;#125;&#x2F;&#x2F; BETTERswitch &amp;#123;case foo():    &#x2F;">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-03-12T06:10:23.000Z">
+<meta property="article:modified_time" content="2023-11-11T16:29:35.582Z">
 <meta property="article:author" content="梁友泽">
+<meta property="article:tag" content="go">
 <meta name="twitter:card" content="summary">
     
 
@@ -207,122 +212,205 @@
 </aside>
 
             
-            <section id="main">
-<div class="timeline timeline-wrap">
-    <div class="timeline-row timeline-row-major">
-        <span class="node"><i class="fa fa-tag"></i></span>
-        <h1 class="title">#杂谈</h1>
-    </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
+            <section id="main"><article id="post-反射_副本" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
                 
     
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2021/01/01/2020%E5%B9%B4%E6%80%BB%E7%BB%93/">2020年总结</a>
+        <h1 class="article-title" itemprop="name">
+            go规范
         </h1>
     
 
-                <div class="article-meta">
-                    
+                
+                    <div class="article-meta">
+                        
     <div class="article-date">
         <i class="fa fa-calendar"></i>
-        <a href="/2021/01/01/2020%E5%B9%B4%E6%80%BB%E7%BB%93/">
-            <time datetime="2021-01-01T09:10:23.000Z" itemprop="datePublished">2021-01-01</time>
+        <a href="/2019/03/12/%E5%8F%8D%E5%B0%84_%E5%89%AF%E6%9C%AC/">
+            <time datetime="2019-03-12T06:10:23.000Z" itemprop="datePublished">2019-03-12</time>
         </a>
     </div>
 
 
-                    
+                        
     <div class="article-category">
     	<i class="fa fa-folder"></i>
-        <a class="article-category-link" href="/categories/%E6%9D%82%E8%B0%88/">杂谈</a>
+        <a class="article-category-link" href="/categories/%E8%A7%84%E8%8C%83/">规范</a>
     </div>
 
-                    
+                        
     <div class="article-tag">
         <i class="fa fa-tag"></i>
-        <a class="tag-link-link" href="/tags/%E6%9D%82%E8%B0%88/" rel="tag">杂谈</a>
+        <a class="tag-link-link" href="/tags/go/" rel="tag">go</a>
     </div>
 
-                </div>
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
+                    </div>
                 
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2020/01/01/2019%E5%B9%B4%E6%80%BB%E7%BB%93/">2019年总结</a>
-        </h1>
-    
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h4 id="1-多个-if-语句可以折叠成-switch"><a href="#1-多个-if-语句可以折叠成-switch" class="headerlink" title="1 . 多个 if 语句可以折叠成 switch"></a>1 . 多个 if 语句可以折叠成 switch</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// NOT BAD</span></span><br><span class="line"><span class="keyword">if</span> foo() &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> bar == baz &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// BETTER</span></span><br><span class="line"><span class="keyword">switch</span> &#123;</span><br><span class="line"><span class="keyword">case</span> foo():</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line"><span class="keyword">case</span> bar == baz:</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line"><span class="keyword">default</span>:</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2020/01/01/2019%E5%B9%B4%E6%80%BB%E7%BB%93/">
-            <time datetime="2020-01-01T09:10:23.000Z" itemprop="datePublished">2020-01-01</time>
-        </a>
-    </div>
+ <span id="more"></span>
 
 
-                    
-    <div class="article-category">
-    	<i class="fa fa-folder"></i>
-        <a class="article-category-link" href="/categories/%E6%9D%82%E8%B0%88/">杂谈</a>
-    </div>
+<h4 id="2-用-chan-struct-来传递信号-chan-bool-表达的不够清楚"><a href="#2-用-chan-struct-来传递信号-chan-bool-表达的不够清楚" class="headerlink" title="2 . 用 chan struct{} 来传递信号, chan bool 表达的不够清楚"></a>2 . 用 chan struct{} 来传递信号, chan bool 表达的不够清楚</h4><p>当你在结构中看到 chan bool 的定义时，有时不容易理解如何使用该值，例如：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Service <span class="keyword">struct</span> &#123;</span><br><span class="line">    deleteCh <span class="keyword">chan</span> <span class="type">bool</span> <span class="comment">// what does this bool mean? </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-                    
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link-link" href="/tags/%E6%9D%82%E8%B0%88/" rel="tag">杂谈</a>
-    </div>
+<p>但是我们可以将其改为明确的 chan struct {} 来使其更清楚：我们不在乎值（它始终是 struct {}），我们关心可能发生的事件，例如：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Service <span class="keyword">struct</span> &#123;</span><br><span class="line">    deleteCh <span class="keyword">chan</span> <span class="keyword">struct</span>&#123;&#125; <span class="comment">// ok, if event than delete something.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-                </div>
-            </div>
+<h4 id="3-time-Second-比-time-Duration-30-time-Second-更好"><a href="#3-time-Second-比-time-Duration-30-time-Second-更好" class="headerlink" title="3 . time.Second 比 time.Duration(30) * time.Second 更好"></a>3 . time.Second 比 time.Duration(30) * time.Second 更好</h4><p>你不需要将无类型的常量包装成类型，编译器会找出来。<br>另外最好将常量移到第一位：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// BAD</span></span><br><span class="line">delay := time.Second * <span class="number">60</span> * <span class="number">24</span> * <span class="number">60</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// GOOD</span></span><br><span class="line">delay := <span class="number">24</span> * <span class="number">60</span> * <span class="number">60</span> * time.Second</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-用-time-Duration-代替-int64-变量名"><a href="#4-用-time-Duration-代替-int64-变量名" class="headerlink" title="4 . 用 time.Duration 代替 int64 + 变量名"></a>4 . 用 time.Duration 代替 int64 + 变量名</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// BAD</span></span><br><span class="line"><span class="keyword">var</span> delayMillis <span class="type">int64</span> = <span class="number">15000</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// GOOD</span></span><br><span class="line"><span class="keyword">var</span> delay time.Duration = <span class="number">15</span> * time.Second</span><br></pre></td></tr></table></figure>
+
+<h4 id="5-按类型分组-const-声明，按逻辑和-x2F-或类型分组-var"><a href="#5-按类型分组-const-声明，按逻辑和-x2F-或类型分组-var" class="headerlink" title="5.  按类型分组 const 声明，按逻辑和&#x2F;或类型分组 var"></a>5.  按类型分组 const 声明，按逻辑和&#x2F;或类型分组 var</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// BAD</span></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">    foo = <span class="number">1</span></span><br><span class="line">    bar = <span class="number">2</span></span><br><span class="line">    message = <span class="string">&quot;warn message&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// MOSTLY BAD</span></span><br><span class="line"><span class="keyword">const</span> foo = <span class="number">1</span></span><br><span class="line"><span class="keyword">const</span> bar = <span class="number">2</span></span><br><span class="line"><span class="keyword">const</span> message = <span class="string">&quot;warn message&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// GOOD</span></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">    foo = <span class="number">1</span></span><br><span class="line">    bar = <span class="number">2</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> message = <span class="string">&quot;warn message&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="6-要比较时间戳，请使用-time-Before-或-time-After-，不要使用-time-Sub-来获得-duration-持续时间-，然后检查它的值。"><a href="#6-要比较时间戳，请使用-time-Before-或-time-After-，不要使用-time-Sub-来获得-duration-持续时间-，然后检查它的值。" class="headerlink" title="6 要比较时间戳，请使用 time.Before 或 time.After ，不要使用 time.Sub 来获得 duration (持续时间)，然后检查它的值。"></a>6 要比较时间戳，请使用 time.Before 或 time.After ，不要使用 time.Sub 来获得 duration (持续时间)，然后检查它的值。</h4><h4 id="7-用-v-来打印数据的比较全的信息"><a href="#7-用-v-来打印数据的比较全的信息" class="headerlink" title="7. 用 %+v 来打印数据的比较全的信息"></a>7. 用 %+v 来打印数据的比较全的信息</h4><h4 id="8-在-Go-里面要小心使用-range"><a href="#8-在-Go-里面要小心使用-range" class="headerlink" title="8. 在 Go 里面要小心使用 range"></a>8. 在 Go 里面要小心使用 range</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i := <span class="keyword">range</span> a and <span class="keyword">for</span> i, v := <span class="keyword">range</span> &amp;a ，都不是 a 的副本</span><br><span class="line">但是 <span class="keyword">for</span> i, v := <span class="keyword">range</span> a 里面的就是 a 的副本</span><br></pre></td></tr></table></figure>
+
+<h4 id="9-不要忘记停止-ticker"><a href="#9-不要忘记停止-ticker" class="headerlink" title="9. 不要忘记停止 ticker"></a>9. 不要忘记停止 ticker</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ticker := time.NewTicker(<span class="number">1</span> * time.Second)</span><br><span class="line"><span class="keyword">defer</span> ticker.Stop()</span><br></pre></td></tr></table></figure>
+
+<h4 id="10-所有代码都应该通过golint和go-vet的检查并无错误。"><a href="#10-所有代码都应该通过golint和go-vet的检查并无错误。" class="headerlink" title="10.所有代码都应该通过golint和go vet的检查并无错误。"></a>10.所有代码都应该通过golint和go vet的检查并无错误。</h4><h4 id="11-零值-sync-Mutex-和-sync-RWMutex-是有效的。所以指向-mutex-的指针基本是不必要的。"><a href="#11-零值-sync-Mutex-和-sync-RWMutex-是有效的。所以指向-mutex-的指针基本是不必要的。" class="headerlink" title="11. 零值 sync.Mutex 和 sync.RWMutex 是有效的。所以指向 mutex 的指针基本是不必要的。"></a>11. 零值 <code>sync.Mutex</code> 和 <code>sync.RWMutex</code> 是有效的。所以指向 mutex 的指针基本是不必要的。</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> mu sync.Mutex</span><br><span class="line">mu.Lock()</span><br></pre></td></tr></table></figure>
+
+<h4 id="12-Channel-的-size-要么是-1，要么是无缓冲的"><a href="#12-Channel-的-size-要么是-1，要么是无缓冲的" class="headerlink" title="12. Channel 的 size 要么是 1，要么是无缓冲的"></a>12. Channel 的 size 要么是 1，要么是无缓冲的</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">c := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">int</span>, <span class="number">1</span>)</span><br><span class="line">c := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">int</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="13-枚举从-1-开始"><a href="#13-枚举从-1-开始" class="headerlink" title="13. 枚举从 1 开始"></a>13. 枚举从 1 开始</h4><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Operation <span class="type">int</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">  Add Operation = <span class="literal">iota</span> + <span class="number">1</span></span><br><span class="line">  Subtract</span><br><span class="line">  Multiply</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h4 id="14-使用-time-Time-表达瞬时时间"><a href="#14-使用-time-Time-表达瞬时时间" class="headerlink" title="14. 使用 time.Time 表达瞬时时间"></a>14. 使用 <code>time.Time</code> 表达瞬时时间</h4><p>在处理时间的瞬间时使用 <code>[time.Time](https://golang.org/pkg/time/#Time)</code>，在比较、添加或减去时间时使用 <code>time.Time</code> 中的方法。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">isActive</span><span class="params">(now, start, stop time.Time)</span></span> <span class="type">bool</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> (start.Before(now) || start.Equal(now)) &amp;&amp; now.Before(stop)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="15-在尽可能的情况下，在初始化要追加的切片时为make-提供一个容量值。"><a href="#15-在尽可能的情况下，在初始化要追加的切片时为make-提供一个容量值。" class="headerlink" title="15. 在尽可能的情况下，在初始化要追加的切片时为make()提供一个容量值。"></a>15. 在尽可能的情况下，在初始化要追加的切片时为<code>make()</code>提供一个容量值。</h4><h4 id="16-优先使用-strconv-而不是-fmt"><a href="#16-优先使用-strconv-而不是-fmt" class="headerlink" title="16. 优先使用 strconv 而不是 fmt"></a>16. 优先使用 strconv 而不是 fmt</h4><h4 id="17-包命名"><a href="#17-包命名" class="headerlink" title="17. 包命名"></a>17. 包命名</h4><ul>
+<li>全部小写。没有大写或下划线。</li>
+<li>大多数使用命名导入的情况下，不需要重命名。</li>
+<li>简短而简洁。请记住，在每个使用的地方都完整标识了该名称。</li>
+<li>不用复数。例如<code>net/url</code>，而不是<code>net/urls</code>。</li>
+<li>不要用“common”，“util”，“shared”或“lib”。这些是不好的，信息量不足的名称。</li>
+</ul>
+<h4 id="18-嵌入式类型（例如-mutex）应位于结构体内的字段列表的顶部，并且必须有一个空行将嵌入式字段与常规字段分隔开。"><a href="#18-嵌入式类型（例如-mutex）应位于结构体内的字段列表的顶部，并且必须有一个空行将嵌入式字段与常规字段分隔开。" class="headerlink" title="18. 嵌入式类型（例如 mutex）应位于结构体内的字段列表的顶部，并且必须有一个空行将嵌入式字段与常规字段分隔开。"></a>18. 嵌入式类型（例如 mutex）应位于结构体内的字段列表的顶部，并且必须有一个空行将嵌入式字段与常规字段分隔开。</h4><h4 id="19-不应明确返回长度为零的切片。应该返回nil-来代替。"><a href="#19-不应明确返回长度为零的切片。应该返回nil-来代替。" class="headerlink" title="19. 不应明确返回长度为零的切片。应该返回nil 来代替。"></a>19. 不应明确返回长度为零的切片。应该返回<code>nil</code> 来代替。</h4><h4 id="20-要检查切片是否为空，请始终使用len-s-0。而非-nil。"><a href="#20-要检查切片是否为空，请始终使用len-s-0。而非-nil。" class="headerlink" title="20. 要检查切片是否为空，请始终使用len(s) == 0。而非 nil。"></a>20. 要检查切片是否为空，请始终使用<code>len(s) == 0</code>。而非 <code>nil</code>。</h4><h4 id="21-time-After-在某些情况下会发生泄露，替换为使用-Timer。"><a href="#21-time-After-在某些情况下会发生泄露，替换为使用-Timer。" class="headerlink" title="21. time.After() 在某些情况下会发生泄露，替换为使用 Timer。"></a>21. time.After() 在某些情况下会发生泄露，替换为使用 Timer。</h4><h4 id="22-读写磁盘时，使用读写-buffer。"><a href="#22-读写磁盘时，使用读写-buffer。" class="headerlink" title="22. 读写磁盘时，使用读写 buffer。"></a>22. 读写磁盘时，使用读写 buffer。</h4><h4 id="23-内存分配复用内存可以使用-sync-Pool"><a href="#23-内存分配复用内存可以使用-sync-Pool" class="headerlink" title="23. 内存分配复用内存可以使用 sync.Pool"></a>23. 内存分配复用内存可以使用 sync.Pool</h4><h4 id=""><a href="#" class="headerlink" title=""></a></h4><h4 id="24-频繁的字符串拼接操作（-x3D-），替换为-StringBuffer-或-StringBuilder"><a href="#24-频繁的字符串拼接操作（-x3D-），替换为-StringBuffer-或-StringBuilder" class="headerlink" title="24. 频繁的字符串拼接操作（+&#x3D;），替换为 StringBuffer 或 StringBuilder"></a>24. 频繁的字符串拼接操作（+&#x3D;），替换为 StringBuffer 或 StringBuilder</h4><h4 id="-1"><a href="#-1" class="headerlink" title=""></a></h4><h4 id="25-并发检测-race"><a href="#25-并发检测-race" class="headerlink" title="25. 并发检测 race"></a>25. 并发检测 race</h4>
+        
         </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
-                
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2018/12/31/2018%E6%80%BB%E7%BB%93/">2018年总结</a>
-        </h1>
-    
-
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fa fa-calendar"></i>
-        <a href="/2018/12/31/2018%E6%80%BB%E7%BB%93/">
-            <time datetime="2018-12-30T17:10:23.000Z" itemprop="datePublished">2018-12-31</time>
-        </a>
-    </div>
+        <footer class="article-footer">
+            <div class="share-container">
 
 
-                    
-    <div class="article-category">
-    	<i class="fa fa-folder"></i>
-        <a class="article-category-link" href="/categories/%E6%9D%82%E8%B0%88/">杂谈</a>
-    </div>
 
-                    
-    <div class="article-tag">
-        <i class="fa fa-tag"></i>
-        <a class="tag-link-link" href="/tags/%E6%9D%82%E8%B0%88/" rel="tag">杂谈</a>
-    </div>
-
-                </div>
-            </div>
-        </div>
-    
 </div>
+
+    <a data-url="https://www.liangyouze.com/2019/03/12/%E5%8F%8D%E5%B0%84_%E5%89%AF%E6%9C%AC/" data-id="clou9idb60000nenm0egn7ex5" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="https://www.liangyouze.com/2019/03/12/%E5%8F%8D%E5%B0%84_%E5%89%AF%E6%9C%AC/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="https://www.liangyouze.com/2019/03/12/%E5%8F%8D%E5%B0%84_%E5%89%AF%E6%9C%AC/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2019/06/01/vim%20%E6%8A%80%E5%B7%A7/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    vim技巧
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2019/03/11/%E5%8F%8D%E5%B0%84/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">反射</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</section>
+    
+
 </section>
             
                 
@@ -508,11 +596,13 @@
     <script>
     var disqus_config = function () {
         
-        this.page.identifier = '';
+            this.page.url = 'https://www.liangyouze.com/2019/03/12/%E5%8F%8D%E5%B0%84_%E5%89%AF%E6%9C%AC/';
+        
+        this.page.identifier = '反射_副本';
     };
     (function() { 
         var d = document, s = d.createElement('script');  
-        s.src = '//' + 'hexo-theme-icarus' + '.disqus.com/count.js';
+        s.src = '//' + 'hexo-theme-icarus' + '.disqus.com/embed.js';
         s.setAttribute('data-timestamp', +new Date());
         (d.head || d.body).appendChild(s);
     })();
