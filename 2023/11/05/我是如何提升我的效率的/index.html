@@ -5,12 +5,12 @@
     
     <title>构建自己高效的workflow | 梁友泽的博客</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="喜欢去探索各种效率工具，自然离不开alfred。alfred可以完成很多事情，其中包括打开各种app，搜索文件，搜索引擎等太多了。 这篇文章主要是记录 关于 Alfred的workflow的开发 alfred 插件开发概述Workflow 是alfred2.0推出的最激动人心的特性, 通过与脚本语言的交互，workflow可以支持任意操作，把您日常的重复性事务封装在脚本中，大大的提高工作效率。">
+    <meta name="description" content="喜欢去探索各种效率工具，自然离不开alfred。alfred可以完成很多事情，其中包括打开各种app，搜索文件，搜索引擎等太多了。 这篇文章主要是记录 关于 Alfred的workflow的开发">
 <meta property="og:type" content="article">
 <meta property="og:title" content="构建自己高效的workflow">
 <meta property="og:url" content="https://www.liangyouze.com/2023/11/05/%E6%88%91%E6%98%AF%E5%A6%82%E4%BD%95%E6%8F%90%E5%8D%87%E6%88%91%E7%9A%84%E6%95%88%E7%8E%87%E7%9A%84/index.html">
 <meta property="og:site_name" content="梁友泽的博客">
-<meta property="og:description" content="喜欢去探索各种效率工具，自然离不开alfred。alfred可以完成很多事情，其中包括打开各种app，搜索文件，搜索引擎等太多了。 这篇文章主要是记录 关于 Alfred的workflow的开发 alfred 插件开发概述Workflow 是alfred2.0推出的最激动人心的特性, 通过与脚本语言的交互，workflow可以支持任意操作，把您日常的重复性事务封装在脚本中，大大的提高工作效率。">
+<meta property="og:description" content="喜欢去探索各种效率工具，自然离不开alfred。alfred可以完成很多事情，其中包括打开各种app，搜索文件，搜索引擎等太多了。 这篇文章主要是记录 关于 Alfred的workflow的开发">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://www.liangyouze.com/images/workflow/image1.png">
 <meta property="og:image" content="https://www.liangyouze.com/images/workflow/image2.png">
@@ -24,7 +24,7 @@
 <meta property="og:image" content="https://www.liangyouze.com/images/workflow/image10.png">
 <meta property="og:image" content="https://www.liangyouze.com/images/workflow/image11.png">
 <meta property="article:published_time" content="2023-11-05T11:50:23.000Z">
-<meta property="article:modified_time" content="2023-11-26T14:49:18.441Z">
+<meta property="article:modified_time" content="2023-11-26T14:50:39.649Z">
 <meta property="article:author" content="梁友泽">
 <meta property="article:tag" content="个人">
 <meta name="twitter:card" content="summary">
@@ -268,7 +268,7 @@
         
             
             <p>喜欢去探索各种效率工具，自然离不开alfred。alfred可以完成很多事情，其中包括打开各种app，搜索文件，搜索引擎等太多了。</p>
-<p>这篇文章主要是记录 关于 Alfred的workflow的开发</p>
+<p>这篇文章主要是记录 关于 Alfred的workflow的开发 <span id="more"></span></p>
 <h3 id="alfred-插件开发概述"><a href="#alfred-插件开发概述" class="headerlink" title="alfred 插件开发概述"></a>alfred 插件开发概述</h3><p>Workflow 是alfred2.0推出的最激动人心的特性, 通过与脚本语言的交互，workflow可以支持任意操作，把您日常的重复性事务封装在脚本中，大大的提高工作效率。 </p>
 <p>Workflow 支持php、bash、perl、ruby以及python作为脚本语言，并内置脚本语言解释器，并通过stdio的形式在各个脚本模块中传递参数。</p>
 <p>在代码中插入 {query}块可以接收上一个脚本输出的内容。形成完整的控制链条。 最后由alfred输出至 Output 模块， 在Output模块中， 我们可以启动浏览器、将内容复制到剪切板、 启动通知中心、甚至执行bash脚本。<br>在日常的使用中，我们通常通过关键字来调用某一模块，例如“find xxx” 即是调用find内建模块 query内容为xxx。 在workflow的开发中， 开发者可以自定义自己编写模块的关键字，只要不与其他模块冲突即可。<br>在workflow的结构中，数据流通过alfred的控制线进行传递，每一个脚本模块的STDIO输出会被alfred替换到 下一个脚本的{query}块中。</p>

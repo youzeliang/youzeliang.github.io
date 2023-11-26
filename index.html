@@ -250,48 +250,11 @@
         
         <div class="article-entry" itemprop="articleBody">
         
-            
-            <p>喜欢去探索各种效率工具，自然离不开alfred。alfred可以完成很多事情，其中包括打开各种app，搜索文件，搜索引擎等太多了。</p>
+            <p><p>喜欢去探索各种效率工具，自然离不开alfred。alfred可以完成很多事情，其中包括打开各种app，搜索文件，搜索引擎等太多了。</p>
 <p>这篇文章主要是记录 关于 Alfred的workflow的开发</p>
-<h3 id="alfred-插件开发概述"><a href="#alfred-插件开发概述" class="headerlink" title="alfred 插件开发概述"></a>alfred 插件开发概述</h3><p>Workflow 是alfred2.0推出的最激动人心的特性, 通过与脚本语言的交互，workflow可以支持任意操作，把您日常的重复性事务封装在脚本中，大大的提高工作效率。 </p>
-<p>Workflow 支持php、bash、perl、ruby以及python作为脚本语言，并内置脚本语言解释器，并通过stdio的形式在各个脚本模块中传递参数。</p>
-<p>在代码中插入 {query}块可以接收上一个脚本输出的内容。形成完整的控制链条。 最后由alfred输出至 Output 模块， 在Output模块中， 我们可以启动浏览器、将内容复制到剪切板、 启动通知中心、甚至执行bash脚本。<br>在日常的使用中，我们通常通过关键字来调用某一模块，例如“find xxx” 即是调用find内建模块 query内容为xxx。 在workflow的开发中， 开发者可以自定义自己编写模块的关键字，只要不与其他模块冲突即可。<br>在workflow的结构中，数据流通过alfred的控制线进行传递，每一个脚本模块的STDIO输出会被alfred替换到 下一个脚本的{query}块中。</p>
-<h3 id="创建一个新的workflow"><a href="#创建一个新的workflow" class="headerlink" title="创建一个新的workflow"></a>创建一个新的workflow</h3><ol>
-<li>首先点击workflow</li>
-<li>创建一个workflow</li>
-</ol>
-<p><img src="/images/workflow/image1.png" alt="image.png"></p>
-<p>然后图里的主要是Bundle Id ，主要就是唯一、description等这些看自己，都是一些无关键要的东西。可以简单对你的脚本进行描述或者是一个良好的命名或者也行了。</p>
-<p><img src="/images/workflow/image2.png" alt="image.png"></p>
-<h4 id="创建一个带有输入参数得workflow"><a href="#创建一个带有输入参数得workflow" class="headerlink" title="创建一个带有输入参数得workflow"></a>创建一个带有输入参数得workflow</h4><p>然后就是选中之前创建的workflow。在右侧选中input，如下图所示。比如我们这里是创建一个关于时间戳转换的脚本，可以选择input里的Script Filter</p>
-<p><img src="/images/workflow/image3.png" alt="image.png"></p>
-<p>然后出来以下这个界面，keyword就是唤醒的关键键。</p>
-<p>如果这里是Python脚本的话，language这里是要选择&#x2F;bin&#x2F;zsh的，然后如果你的脚本是需要输入参数的话。后面要跟上wtih input as {query}，如果你的脚步完全不依赖于外部库的话，也是可以直接在这里写的</p>
-<p>然后 Script 这里的话是需要写你运行的脚本的路径</p>
-<p><img src="/images/workflow/image4.png" alt="image.png"></p>
-<p>然后打开上图中 问号旁边的文件夹，会看到这样一个文件。接下来要做的事情就是要把python3有关的workflow代码放在这里去。</p>
-<p><img src="/images/workflow/image5.png" alt="image.png"></p>
-<p>这里有一个不小的坑，然后网上大部分帖子都是粘贴复制，所以很多都还是n多年前复制过来的，因为原始仓库里只有python2的代码，python3不支持部分库了，所以我是根据 <a target="_blank" rel="noopener" href="https://github.com/NorthIsUp/alfred-workflow-py3">这里</a>的一个仓库，clone下来后，其实只需要workflow里的代码就行。所以最终你会看到这样一个目录</p>
-<p><img src="/images/workflow/image6.png" alt="image.png"></p>
-<p>另外附上t.py里的代码</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line"><span class="keyword">from</span> workflow <span class="keyword">import</span> Workflow3</span><br><span class="line"></span><br><span class="line">S = requests.Session()</span><br><span class="line"></span><br><span class="line">REGEXP_TIMESTAMP = <span class="string">r&#x27;^\d+$&#x27;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">convert_timestamp_to_datetime</span>(<span class="params">timestamp</span>):</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        timestamp = <span class="built_in">int</span>(timestamp)</span><br><span class="line">        dt_object = datetime.utcfromtimestamp(timestamp)</span><br><span class="line">        <span class="keyword">return</span> dt_object.strftime(<span class="string">&#x27;%Y-%m-%d %H:%M:%S&#x27;</span>)</span><br><span class="line">    <span class="keyword">except</span> ValueError:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Invalid timestamp&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">generate_feedback_results</span>(<span class="params">judge_code, result</span>):</span><br><span class="line">    wf = Workflow3()</span><br><span class="line">    <span class="keyword">if</span> judge_code == <span class="number">1</span>:</span><br><span class="line">        kwargs = &#123;</span><br><span class="line">            <span class="string">&#x27;title&#x27;</span>: result,</span><br><span class="line">            <span class="string">&#x27;subtitle&#x27;</span>: <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">            <span class="string">&quot;valid&quot;</span>: <span class="literal">True</span>,</span><br><span class="line">            <span class="string">&#x27;arg&#x27;</span>: result</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        kwargs = &#123;</span><br><span class="line">            <span class="string">&#x27;title&#x27;</span>: result,</span><br><span class="line">            <span class="string">&#x27;subtitle&#x27;</span>: <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;valid&#x27;</span>: <span class="literal">False</span></span><br><span class="line">        &#125;</span><br><span class="line">    wf.add_item(**kwargs)</span><br><span class="line">    wf.send_feedback()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    timestamp = sys.argv[<span class="number">1</span>]</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(re.findall(REGEXP_TIMESTAMP, timestamp)) &gt; <span class="number">0</span>:</span><br><span class="line">        result = convert_timestamp_to_datetime(timestamp)</span><br><span class="line">        generate_feedback_results(<span class="number">1</span>, result)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        generate_feedback_results(<span class="number">0</span>, <span class="string">&quot;Invalid timestamp&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    main()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-<p>然后效果大概就是这样了</p>
-<p><img src="/images/workflow/image7.png" alt="image.png"></p>
-<p>其实类似于这些的话也能在python里通过参数来实现，也就是终端，但是如果是多方的一些东西的话，可能还是借助于该工具比较好</p>
-<h4 id="创建一个带有无参数得workflow"><a href="#创建一个带有无参数得workflow" class="headerlink" title="创建一个带有无参数得workflow"></a>创建一个带有无参数得workflow</h4><p>然后可能也有会有这样的需求，比如根据python处理后的结果，然后需要自动把这个结果比如复制到粘贴板里面去。然后就这样这样做</p>
-<p><img src="/images/workflow/image8.png" alt="image.png"></p>
-<p>选择一个outputs，然后再选择copy to clipboard 。 </p>
-<p>这样输入now的时候，就会自动显示时间戳还能复制到粘贴板里面去了</p>
-<p><img src="/images/workflow/image9.png" alt="image.png"></p>
-<p>从debug里的日志也能看出来</p>
-<p><img src="/images/workflow/image10.png" alt="image.png"></p>
-<h4 id="debug-模式"><a href="#debug-模式" class="headerlink" title="debug 模式"></a>debug 模式</h4><p>当然在创建workflow的过程中，还是比较顺畅的，如果要开启debug模式也很简单。</p>
-<p><img src="/images/workflow/image11.png" alt="image.png"></p>
-<p>这里就能完美开启了</p>
-<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>比如在项目中会经常用ide打开某一些开发的应用，也可以一套流程下来。一键启动打开。如果大家有啥好玩的workflow也可以交流交流</p>
-
+            <p class="article-more-link">
+                <a href="/2023/11/05/%E6%88%91%E6%98%AF%E5%A6%82%E4%BD%95%E6%8F%90%E5%8D%87%E6%88%91%E7%9A%84%E6%95%88%E7%8E%87%E7%9A%84/#more">查看更多</a>
+            </p>
         
         </div>
         <footer class="article-footer">
