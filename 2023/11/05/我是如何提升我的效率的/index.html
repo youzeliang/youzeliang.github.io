@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>构建自己高效的workflow | 梁友泽的博客</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="喜欢去探索各种效率工具，自然离不开alfred。alfred可以完成很多事情，其中包括打开各种app，搜索文件，搜索引擎等太多了。 这篇文章主要是记录 关于 Alfred的workflow的开发 alfred 插件开发概述Workflow 是alfred2.0推出的最激动人心的特性, 通过与脚本语言的交互，workflow可以支持任意操作，把您日常的重复性事务封装在脚本中，大大的提高工作效率。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="构建自己高效的workflow">
+<meta property="og:url" content="https://www.liangyouze.com/2023/11/05/%E6%88%91%E6%98%AF%E5%A6%82%E4%BD%95%E6%8F%90%E5%8D%87%E6%88%91%E7%9A%84%E6%95%88%E7%8E%87%E7%9A%84/index.html">
+<meta property="og:site_name" content="梁友泽的博客">
+<meta property="og:description" content="喜欢去探索各种效率工具，自然离不开alfred。alfred可以完成很多事情，其中包括打开各种app，搜索文件，搜索引擎等太多了。 这篇文章主要是记录 关于 Alfred的workflow的开发 alfred 插件开发概述Workflow 是alfred2.0推出的最激动人心的特性, 通过与脚本语言的交互，workflow可以支持任意操作，把您日常的重复性事务封装在脚本中，大大的提高工作效率。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.liangyouze.com/images/workflow/image1.png">
+<meta property="og:image" content="https://www.liangyouze.com/images/workflow/image2.png">
+<meta property="og:image" content="https://www.liangyouze.com/images/workflow/image3.png">
+<meta property="og:image" content="https://www.liangyouze.com/images/workflow/image4.png">
+<meta property="og:image" content="https://www.liangyouze.com/images/workflow/image5.png">
+<meta property="og:image" content="https://www.liangyouze.com/images/workflow/image6.png">
+<meta property="og:image" content="https://www.liangyouze.com/images/workflow/image7.png">
+<meta property="og:image" content="https://www.liangyouze.com/images/workflow/image8.png">
+<meta property="og:image" content="https://www.liangyouze.com/images/workflow/image9.png">
+<meta property="og:image" content="https://www.liangyouze.com/images/workflow/image10.png">
+<meta property="og:image" content="https://www.liangyouze.com/images/workflow/image11.png">
+<meta property="article:published_time" content="2023-11-05T11:50:23.000Z">
+<meta property="article:modified_time" content="2023-11-26T14:49:18.441Z">
+<meta property="article:author" content="梁友泽">
+<meta property="article:tag" content="个人">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.liangyouze.com/images/workflow/image1.png">
+    
+
+    
+
+    
+
+    
+<link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+
+    
+<link rel="stylesheet" href="/libs/open-sans/styles.css">
+
+    
+<link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+<script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+
+    
+    
+        
+<link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+
+    
+    
+    
+    
+
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">梁友泽的博客</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives/">分类</a>
+                
+                    <a class="main-nav-link" href="/categories/">归档</a>
+                
+                    <a class="main-nav-link" href="/about">关于</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/rolle.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives/">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories/">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile" class="profile-fixed">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/rolle.png" />
+            <h2 id="name">梁友泽</h2>
+            <h3 id="title">Developer</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>BeiJing, China</span>
+            <a id="follow" target="_blank" href="https://github.com/youzeliang">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                35
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                20
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/youzeliang" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/i@liangyouze.com" target="_blank" title="email" class=tooltip>
+                            <i class="fa fa-email"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/css/images/rolle_wechat.jpg" target="_blank" title="wechat" class=tooltip>
+                            <i class="fa fa-wechat"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-我是如何提升我的效率的" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            构建自己高效的workflow
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2023/11/05/%E6%88%91%E6%98%AF%E5%A6%82%E4%BD%95%E6%8F%90%E5%8D%87%E6%88%91%E7%9A%84%E6%95%88%E7%8E%87%E7%9A%84/">
+            <time datetime="2023-11-05T11:50:23.000Z" itemprop="datePublished">2023-11-05</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/%E6%95%88%E7%8E%87/">效率</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fa fa-tag"></i>
+        <a class="tag-link-link" href="/tags/%E4%B8%AA%E4%BA%BA/" rel="tag">个人</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>喜欢去探索各种效率工具，自然离不开alfred。alfred可以完成很多事情，其中包括打开各种app，搜索文件，搜索引擎等太多了。</p>
+<p>这篇文章主要是记录 关于 Alfred的workflow的开发</p>
+<h3 id="alfred-插件开发概述"><a href="#alfred-插件开发概述" class="headerlink" title="alfred 插件开发概述"></a>alfred 插件开发概述</h3><p>Workflow 是alfred2.0推出的最激动人心的特性, 通过与脚本语言的交互，workflow可以支持任意操作，把您日常的重复性事务封装在脚本中，大大的提高工作效率。 </p>
+<p>Workflow 支持php、bash、perl、ruby以及python作为脚本语言，并内置脚本语言解释器，并通过stdio的形式在各个脚本模块中传递参数。</p>
+<p>在代码中插入 {query}块可以接收上一个脚本输出的内容。形成完整的控制链条。 最后由alfred输出至 Output 模块， 在Output模块中， 我们可以启动浏览器、将内容复制到剪切板、 启动通知中心、甚至执行bash脚本。<br>在日常的使用中，我们通常通过关键字来调用某一模块，例如“find xxx” 即是调用find内建模块 query内容为xxx。 在workflow的开发中， 开发者可以自定义自己编写模块的关键字，只要不与其他模块冲突即可。<br>在workflow的结构中，数据流通过alfred的控制线进行传递，每一个脚本模块的STDIO输出会被alfred替换到 下一个脚本的{query}块中。</p>
+<h3 id="创建一个新的workflow"><a href="#创建一个新的workflow" class="headerlink" title="创建一个新的workflow"></a>创建一个新的workflow</h3><ol>
+<li>首先点击workflow</li>
+<li>创建一个workflow</li>
+</ol>
+<p><img src="/images/workflow/image1.png" alt="image.png"></p>
+<p>然后图里的主要是Bundle Id ，主要就是唯一、description等这些看自己，都是一些无关键要的东西。可以简单对你的脚本进行描述或者是一个良好的命名或者也行了。</p>
+<p><img src="/images/workflow/image2.png" alt="image.png"></p>
+<h4 id="创建一个带有输入参数得workflow"><a href="#创建一个带有输入参数得workflow" class="headerlink" title="创建一个带有输入参数得workflow"></a>创建一个带有输入参数得workflow</h4><p>然后就是选中之前创建的workflow。在右侧选中input，如下图所示。比如我们这里是创建一个关于时间戳转换的脚本，可以选择input里的Script Filter</p>
+<p><img src="/images/workflow/image3.png" alt="image.png"></p>
+<p>然后出来以下这个界面，keyword就是唤醒的关键键。</p>
+<p>如果这里是Python脚本的话，language这里是要选择&#x2F;bin&#x2F;zsh的，然后如果你的脚本是需要输入参数的话。后面要跟上wtih input as {query}，如果你的脚步完全不依赖于外部库的话，也是可以直接在这里写的</p>
+<p>然后 Script 这里的话是需要写你运行的脚本的路径</p>
+<p><img src="/images/workflow/image4.png" alt="image.png"></p>
+<p>然后打开上图中 问号旁边的文件夹，会看到这样一个文件。接下来要做的事情就是要把python3有关的workflow代码放在这里去。</p>
+<p><img src="/images/workflow/image5.png" alt="image.png"></p>
+<p>这里有一个不小的坑，然后网上大部分帖子都是粘贴复制，所以很多都还是n多年前复制过来的，因为原始仓库里只有python2的代码，python3不支持部分库了，所以我是根据 <a target="_blank" rel="noopener" href="https://github.com/NorthIsUp/alfred-workflow-py3">这里</a>的一个仓库，clone下来后，其实只需要workflow里的代码就行。所以最终你会看到这样一个目录</p>
+<p><img src="/images/workflow/image6.png" alt="image.png"></p>
+<p>另外附上t.py里的代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line"><span class="keyword">from</span> workflow <span class="keyword">import</span> Workflow3</span><br><span class="line"></span><br><span class="line">S = requests.Session()</span><br><span class="line"></span><br><span class="line">REGEXP_TIMESTAMP = <span class="string">r&#x27;^\d+$&#x27;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">convert_timestamp_to_datetime</span>(<span class="params">timestamp</span>):</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        timestamp = <span class="built_in">int</span>(timestamp)</span><br><span class="line">        dt_object = datetime.utcfromtimestamp(timestamp)</span><br><span class="line">        <span class="keyword">return</span> dt_object.strftime(<span class="string">&#x27;%Y-%m-%d %H:%M:%S&#x27;</span>)</span><br><span class="line">    <span class="keyword">except</span> ValueError:</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;Invalid timestamp&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">generate_feedback_results</span>(<span class="params">judge_code, result</span>):</span><br><span class="line">    wf = Workflow3()</span><br><span class="line">    <span class="keyword">if</span> judge_code == <span class="number">1</span>:</span><br><span class="line">        kwargs = &#123;</span><br><span class="line">            <span class="string">&#x27;title&#x27;</span>: result,</span><br><span class="line">            <span class="string">&#x27;subtitle&#x27;</span>: <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">            <span class="string">&quot;valid&quot;</span>: <span class="literal">True</span>,</span><br><span class="line">            <span class="string">&#x27;arg&#x27;</span>: result</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        kwargs = &#123;</span><br><span class="line">            <span class="string">&#x27;title&#x27;</span>: result,</span><br><span class="line">            <span class="string">&#x27;subtitle&#x27;</span>: <span class="string">&#x27;&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;valid&#x27;</span>: <span class="literal">False</span></span><br><span class="line">        &#125;</span><br><span class="line">    wf.add_item(**kwargs)</span><br><span class="line">    wf.send_feedback()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    timestamp = sys.argv[<span class="number">1</span>]</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(re.findall(REGEXP_TIMESTAMP, timestamp)) &gt; <span class="number">0</span>:</span><br><span class="line">        result = convert_timestamp_to_datetime(timestamp)</span><br><span class="line">        generate_feedback_results(<span class="number">1</span>, result)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        generate_feedback_results(<span class="number">0</span>, <span class="string">&quot;Invalid timestamp&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    main()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<p>然后效果大概就是这样了</p>
+<p><img src="/images/workflow/image7.png" alt="image.png"></p>
+<p>其实类似于这些的话也能在python里通过参数来实现，也就是终端，但是如果是多方的一些东西的话，可能还是借助于该工具比较好</p>
+<h4 id="创建一个带有无参数得workflow"><a href="#创建一个带有无参数得workflow" class="headerlink" title="创建一个带有无参数得workflow"></a>创建一个带有无参数得workflow</h4><p>然后可能也有会有这样的需求，比如根据python处理后的结果，然后需要自动把这个结果比如复制到粘贴板里面去。然后就这样这样做</p>
+<p><img src="/images/workflow/image8.png" alt="image.png"></p>
+<p>选择一个outputs，然后再选择copy to clipboard 。 </p>
+<p>这样输入now的时候，就会自动显示时间戳还能复制到粘贴板里面去了</p>
+<p><img src="/images/workflow/image9.png" alt="image.png"></p>
+<p>从debug里的日志也能看出来</p>
+<p><img src="/images/workflow/image10.png" alt="image.png"></p>
+<h4 id="debug-模式"><a href="#debug-模式" class="headerlink" title="debug 模式"></a>debug 模式</h4><p>当然在创建workflow的过程中，还是比较顺畅的，如果要开启debug模式也很简单。</p>
+<p><img src="/images/workflow/image11.png" alt="image.png"></p>
+<p>这里就能完美开启了</p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>比如在项目中会经常用ide打开某一些开发的应用，也可以一套流程下来。一键启动打开。如果大家有啥好玩的workflow也可以交流交流</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="https://www.liangyouze.com/2023/11/05/%E6%88%91%E6%98%AF%E5%A6%82%E4%BD%95%E6%8F%90%E5%8D%87%E6%88%91%E7%9A%84%E6%95%88%E7%8E%87%E7%9A%84/" data-id="clpflje5h0000p8nmhyrc91sg" class="article-share-link"><i class="fa fa-share"></i>分享到</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+        <a href="https://www.liangyouze.com/2023/11/05/%E6%88%91%E6%98%AF%E5%A6%82%E4%BD%95%E6%8F%90%E5%8D%87%E6%88%91%E7%9A%84%E6%95%88%E7%8E%87%E7%9A%84/#comments" class="article-comment-link disqus-comment-count" data-disqus-url="https://www.liangyouze.com/2023/11/05/%E6%88%91%E6%98%AF%E5%A6%82%E4%BD%95%E6%8F%90%E5%8D%87%E6%88%91%E7%9A%84%E6%95%88%E7%8E%87%E7%9A%84/">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2023/05/05/%E9%AB%98%E9%98%B6%E5%87%BD%E6%95%B0%E7%BC%96%E7%A8%8B%E6%8A%80%E5%B7%A7/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">高阶函数编程技巧</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a target="_blank" rel="noopener" href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2023/11/05/%E6%88%91%E6%98%AF%E5%A6%82%E4%BD%95%E6%8F%90%E5%8D%87%E6%88%91%E7%9A%84%E6%95%88%E7%8E%87%E7%9A%84/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/%E6%95%88%E7%8E%87/">效率</a></p>
+                            <p class="item-title"><a href="/2023/11/05/%E6%88%91%E6%98%AF%E5%A6%82%E4%BD%95%E6%8F%90%E5%8D%87%E6%88%91%E7%9A%84%E6%95%88%E7%8E%87%E7%9A%84/" class="title">构建自己高效的workflow</a></p>
+                            <p class="item-date"><time datetime="2023-11-05T11:50:23.000Z" itemprop="datePublished">2023-11-05</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2023/05/05/%E9%AB%98%E9%98%B6%E5%87%BD%E6%95%B0%E7%BC%96%E7%A8%8B%E6%8A%80%E5%B7%A7/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/%E5%87%BD%E6%95%B0/">函数</a></p>
+                            <p class="item-title"><a href="/2023/05/05/%E9%AB%98%E9%98%B6%E5%87%BD%E6%95%B0%E7%BC%96%E7%A8%8B%E6%8A%80%E5%B7%A7/" class="title">高阶函数编程技巧</a></p>
+                            <p class="item-date"><time datetime="2023-05-05T11:50:23.000Z" itemprop="datePublished">2023-05-05</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2022/06/05/golang%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/%E5%86%85%E5%AD%98%E9%80%83%E9%80%B8/">内存逃逸</a></p>
+                            <p class="item-title"><a href="/2022/06/05/golang%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90/" class="title">golang逃逸分析</a></p>
+                            <p class="item-date"><time datetime="2022-06-05T11:50:23.000Z" itemprop="datePublished">2022-06-05</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2022/05/05/gin%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/gin/">gin</a></p>
+                            <p class="item-title"><a href="/2022/05/05/gin%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" class="title">gin源码阅读</a></p>
+                            <p class="item-date"><time datetime="2022-05-05T11:50:24.000Z" itemprop="datePublished">2022-05-05</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <!-- <div class="item-thumbnail">
+                            <a href="/2022/04/05/%E7%94%B1%E4%B8%80%E8%A1%8C%E4%BB%A3%E7%A0%81%E5%BC%95%E5%8F%91%E7%9A%84%E5%8F%98%E9%87%8F%E5%88%86%E9%85%8D%E6%80%9D%E8%80%83/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div> -->
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/%E5%86%85%E5%AD%98%E9%80%83%E9%80%B8/">内存逃逸</a></p>
+                            <p class="item-title"><a href="/2022/04/05/%E7%94%B1%E4%B8%80%E8%A1%8C%E4%BB%A3%E7%A0%81%E5%BC%95%E5%8F%91%E7%9A%84%E5%8F%98%E9%87%8F%E5%88%86%E9%85%8D%E6%80%9D%E8%80%83/" class="title">由一行代码引发的变量分配思考</a></p>
+                            <p class="item-date"><time datetime="2022-04-05T11:50:23.000Z" itemprop="datePublished">2022-04-05</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL/">MySQL</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Python/">Python</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/docker/">docker</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/gin/">gin</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/golang/">golang</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/kafka/">kafka</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/map/">map</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/panic/">panic</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/string/">string</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/vim/">vim</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%86%85%E5%AD%98%E9%80%83%E9%80%B8/">内存逃逸</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%87%BD%E6%95%B0/">函数</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%8F%8D%E5%B0%84/">反射</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%88%E7%8E%87/">效率</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%9D%82%E8%B0%88/">杂谈</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%A7%84%E8%8C%83/">规范</a><span class="category-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">十一月 2023</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/06/">六月 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">五月 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">四月 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/09/">九月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">二月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">十月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">八月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">七月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">一月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">十一月 2017</a><span class="archive-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/" rel="tag">Docker</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/" rel="tag">MySQL</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Python/" rel="tag">Python</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/context/" rel="tag">context</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/elasticsearch/" rel="tag">elasticsearch</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/" rel="tag">go</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/" rel="tag">golang</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iframe/" rel="tag">iframe</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kafka/" rel="tag">kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pprof/" rel="tag">pprof</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/" rel="tag">vim</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%AA%E4%BA%BA/" rel="tag">个人</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/" rel="tag">内存对齐</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" rel="tag">字符串</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%9D%82%E8%B0%88/" rel="tag">杂谈</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%B4%A2%E5%BC%95/" rel="tag">索引</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%84%E5%88%99/" rel="tag">规则</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AE%A2%E5%8D%95%E5%8F%B7/" rel="tag">订单号</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%AF%BB%E4%B9%A6/" rel="tag">读书</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B7%A8%E5%9F%9F/" rel="tag">跨域</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/Docker/" style="font-size: 10px;">Docker</a> <a href="/tags/MySQL/" style="font-size: 17.5px;">MySQL</a> <a href="/tags/Python/" style="font-size: 10px;">Python</a> <a href="/tags/context/" style="font-size: 10px;">context</a> <a href="/tags/elasticsearch/" style="font-size: 10px;">elasticsearch</a> <a href="/tags/go/" style="font-size: 20px;">go</a> <a href="/tags/golang/" style="font-size: 15px;">golang</a> <a href="/tags/iframe/" style="font-size: 10px;">iframe</a> <a href="/tags/kafka/" style="font-size: 10px;">kafka</a> <a href="/tags/pprof/" style="font-size: 10px;">pprof</a> <a href="/tags/vim/" style="font-size: 10px;">vim</a> <a href="/tags/%E4%B8%AA%E4%BA%BA/" style="font-size: 10px;">个人</a> <a href="/tags/%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/" style="font-size: 10px;">内存对齐</a> <a href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" style="font-size: 12.5px;">字符串</a> <a href="/tags/%E6%9D%82%E8%B0%88/" style="font-size: 15px;">杂谈</a> <a href="/tags/%E7%B4%A2%E5%BC%95/" style="font-size: 10px;">索引</a> <a href="/tags/%E8%A7%84%E5%88%99/" style="font-size: 10px;">规则</a> <a href="/tags/%E8%AE%A2%E5%8D%95%E5%8F%B7/" style="font-size: 10px;">订单号</a> <a href="/tags/%E8%AF%BB%E4%B9%A6/" style="font-size: 10px;">读书</a> <a href="/tags/%E8%B7%A8%E5%9F%9F/" style="font-size: 10px;">跨域</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a target="_blank" rel="noopener" href="http://www.liangyongrui.com">梁永锐</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+			<!--不蒜子统计-->
+           <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <span id="busuanzi_container_site_pv">本站总访问量:<span id="busuanzi_value_site_pv"></span>&nbsp;本站总访次数:<span id="busuanzi_value_site_uv"></span></span><br>
+		
+            &copy; 2023 梁友泽<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a target="_blank" rel="noopener" href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+    
+    <script>
+    var disqus_config = function () {
+        
+            this.page.url = 'https://www.liangyouze.com/2023/11/05/%E6%88%91%E6%98%AF%E5%A6%82%E4%BD%95%E6%8F%90%E5%8D%87%E6%88%91%E7%9A%84%E6%95%88%E7%8E%87%E7%9A%84/';
+        
+        this.page.identifier = '我是如何提升我的效率的';
+    };
+    (function() { 
+        var d = document, s = d.createElement('script');  
+        s.src = '//' + 'hexo-theme-icarus' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+
+
+
+
+    
+        
+<script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-share.min.js"></script>
+
+        
+<script src="/libs/lightgallery/js/lg-video.min.js"></script>
+
+    
+    
+        
+<script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+
+    
+    
+
+
+
+<!-- Custom Scripts -->
+
+<script src="/js/main.js"></script>
+
+
+    </div>
+</body>
+</html>
