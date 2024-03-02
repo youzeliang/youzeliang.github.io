@@ -17,7 +17,7 @@
 <meta property="og:image" content="https://www.liangyouze.com/images/go/image2.png">
 <meta property="og:image" content="https://www.liangyouze.com/images/go/image3.png">
 <meta property="article:published_time" content="2020-10-11T07:10:23.000Z">
-<meta property="article:modified_time" content="2023-11-11T12:25:07.057Z">
+<meta property="article:modified_time" content="2024-03-02T06:38:37.327Z">
 <meta property="article:author" content="梁友泽">
 <meta property="article:tag" content="golang">
 <meta name="twitter:card" content="summary">
@@ -370,8 +370,8 @@
 <p>注意：(<a target="_blank" rel="noopener" href="https://github.com/golang/go/commit/2333c6299f340a5f76a73a4fec6db23ffa388e97?branch=2333c6299f340a5f76a73a4fec6db23ffa388e97&diff=unified">官方代码</a>在2020-09-25 换成了 if old.cap &lt; 1024{} )</p>
 <ul>
 <li>如果新申请容量（cap）大于旧容量（old.cap）的两倍，则最终容量（newcap）是新申请的容量（cap）；</li>
-<li>如果旧切片的长度小于 1024，则最终容量是旧容量的 2 倍，即“newcap&#x3D;doublecap”；</li>
-<li>如果旧切片的长度大于或等于 1024，则最终容量从旧容量开始循环增加原来的 1&#x2F;4，直到最终容量大于或等于新申请的容量为止；</li>
+<li>如果旧切片的长度小于 1024，则最终容量是旧容量的 2 倍，即“newcap&#x3D;doublecap”；  (注意1.18后时256)</li>
+<li>如果旧切片的长度大于或等于 1024，则最终容量从旧容量开始循环增加原来的 1&#x2F;4，直到最终容量大于或等于新申请的容量为止；(注意1.18后时256，&gt;&#x3D;512)</li>
 <li>如果最终容量计算值溢出，即超过了 int 的最大范围，则最终容量就是新申请容量。</li>
 </ul>
 <ol start="2">
@@ -382,9 +382,20 @@
 
 <p>^uint(0)在32位系统上返回的是0XFFFFFFFF, 也就是2^32, 在64位系统上返回的是0xFFFFFFFFFFFFFFFF, 也就是2^64</p>
 <p>申请分配内存会匹配到最接近的规格</p>
+<p>确认了最新容量后，则进行内存对齐。通过对元素的大小（et.size）的判断，对了内存对齐。通过数组class_to_size拿到对齐的值。</p>
 <ol start="3">
 <li>newCap &#x3D; 申请分配内存 &#x2F;  元素类型大小</li>
 </ol>
+<p>在1.22版本后切片的扩容机制变更为</p>
+<ol>
+<li>初始化变量：函数接受两个参数，newLen 表示切片的新长度，oldCap 表示切片的旧容量。开始时将 newcap 初始化为 oldCap。</li>
+<li>判断是否需要直接扩容至新长度：首先计算 doublecap，即旧容量的两倍。如果新长度大于 doublecap，则直接返回新长度，因为此时直接扩容到新长度即可。</li>
+<li>阈值判断：定义了一个阈值常量 threshold，其值为 256。如果旧容量小于该阈值，那么新容量直接设置为 doublecap。</li>
+<li>循环计算新容量：对于大于等于阈值的旧容量，采用一种新的扩容策略，即每次增加 newcap 的 1.25 倍，直到 newcap 大于等于 newLen。</li>
+<li>溢出检查：通过将 newcap 强制转换为 uint 类型进行溢出检查。如果 newcap 溢出，则直接返回新长度。</li>
+<li>返回新容量：最后返回新容量，如果新容量小于等于 0，则返回新长度，以防溢出。</li>
+</ol>
+<p>这个机制在处理切片扩容时，尤其是针对大容量的切片，可以更加有效地管理内存，避免频繁的内存分配和拷贝操作，从而提高性能。</p>
 <h3 id="拷贝切片"><a href="#拷贝切片" class="headerlink" title="拷贝切片"></a>拷贝切片</h3><p>当我们使用 <code>copy(a, b)</code> 的形式对切片进行拷贝时，编译期间的 <code>[cmd/compile/internal/gc.copyany](https://github.com/golang/go/blob/bf4990522263503a1219372cd8f1ee9422b51324/src/cmd/compile/internal/gc/walk.go#L2980-L3040)</code> 函数也会分两种情况进行处理，如果当前 <code>copy</code> 不是在运行时调用的，<code>copy(a, b)</code> 会被直接转换成下面的代码：</p>
 <p>之后，向 Go 内存管理器申请内存，将老 slice 中的数据复制过去，并且将 append 的元素添加到新的底层数组中。<br>最后，向 <code>growslice</code> 函数调用者返回一个新的 slice，这个 slice 的长度并没有变化，而容量却增大了。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">n := <span class="built_in">len</span>(a)</span><br><span class="line"><span class="keyword">if</span> n &gt; <span class="built_in">len</span>(b) &#123;</span><br><span class="line">    n = <span class="built_in">len</span>(b)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> a.ptr != b.ptr &#123;</span><br><span class="line">    memmove(a.ptr, b.ptr, n*sizeof(elem(a))) </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -765,7 +776,7 @@
            <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
             <span id="busuanzi_container_site_pv">本站总访问量:<span id="busuanzi_value_site_pv"></span>&nbsp;本站总访次数:<span id="busuanzi_value_site_uv"></span></span><br>
 		
-            &copy; 2023 梁友泽<br>
+            &copy; 2024 梁友泽<br>
             Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a target="_blank" rel="noopener" href="http://github.com/ppoffice">PPOffice</a>
         </div>
     </div>
