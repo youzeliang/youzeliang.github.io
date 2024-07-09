@@ -13,7 +13,6 @@
 <meta property="og:description" content="大概有这样的需求。 在搜索资源，或者查找解决棘手bug的方法的时候，会经历很长时间来回不断地翻阅一些网站，有的问题甚至半年后还需要重新来过。那些曾经访问过且证明没有任何意义的网页，会因为一个“优秀的”标题而导致再次浪费我们的时间。所以为什么我们不能拉黑它们呢？市面上的Chrome网站黑名单不少，比如有">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://www.liangyouze.com/images/efficiency/p1.png">
-<meta property="og:image" content="https://www.liangyouze.com/images/efficiency/p1.png">
 <meta property="og:image" content="https://www.liangyouze.com/images/efficiency/p2.png">
 <meta property="og:image" content="https://www.liangyouze.com/images/efficiency/p3.png">
 <meta property="og:image" content="https://www.liangyouze.com/images/efficiency/p4.png">
@@ -24,7 +23,7 @@
 <meta property="og:image" content="https://www.liangyouze.com/images/efficiency/p9.png">
 <meta property="og:image" content="https://www.liangyouze.com/images/efficiency/p10.png">
 <meta property="article:published_time" content="2024-02-11T06:10:23.000Z">
-<meta property="article:modified_time" content="2024-07-09T16:39:07.408Z">
+<meta property="article:modified_time" content="2024-07-09T16:40:57.197Z">
 <meta property="article:author" content="梁友泽">
 <meta property="article:tag" content="chrome">
 <meta name="twitter:card" content="summary">
@@ -267,33 +266,32 @@
         <div class="article-entry" itemprop="articleBody">
         
             
-            <p><img src="/images/efficiency/p1.png" alt="image.png"></p>
-<p>大概有这样的需求。</p>
+            <p>大概有这样的需求。</p>
 <p>在搜索资源，或者查找解决棘手bug的方法的时候，会经历很长时间来回不断地翻阅一些网站，有的问题甚至半年后还需要重新来过。那些曾经访问过且证明没有任何意义的网页，会因为一个“优秀的”标题而导致再次浪费我们的时间。所以为什么我们不能拉黑它们呢？<br>市面上的Chrome网站黑名单不少，比如有  <span id="more"></span></p>
 <ol>
 <li>UblackList，这个网站只能解决在搜索过程中不被检索到的黑名单。而且如果是想屏蔽某一个具体的网页，而不是整个网站，则需要单独加到黑名单。</li>
 </ol>
-<p><img src="/images/efficiency/p1.png" alt="image.png"></p>
+<p><img src="/images/efficiency/p1.png"></p>
 <p>这种在检索的时候会比较方便</p>
 <ol>
 <li>BlockSite 不算太友好，操作不习惯</li>
 </ol>
-<p><img src="/images/efficiency/p2.png" alt="image.png"></p>
+<p><img src="/images/efficiency/p2.png"></p>
 <ol>
 <li>browse-manager 这是一款国人开发的插件，还不错，除了不支持快捷键。其他都比较方改变了。而且也能导出数据。</li>
 </ol>
 <p>于是就想能不能自己也开发一款自己的Chrome插件<br>作为一名后端工程师，距离上次写前端代码还是刚毕业的时候，时间成本也有限。不太可能为了写一款插件而去刻意去学前端代码。但在如今大模型爆发的时代，很多人借助于ChatGPT来实现自己的Chrome插件。于是，说动手就动手。<br>所以，我开始向ChatGPT提出我的需求</p>
-<p><img src="/images/efficiency/p3.png" alt="image.png"></p>
+<p><img src="/images/efficiency/p3.png"></p>
 <p>于是给出了以下这些对话</p>
-<p><img src="/images/efficiency/p4.png" alt="image.png">]</p>
+<p><img src="/images/efficiency/p4.png">]</p>
 <p>当我一步一步按照它给我的步骤来实现时。前面还是挺顺的。<br>首先是添加方式。直接在这里就能添加了</p>
-<p><img src="/images/efficiency/p5.png" alt="image.png"></p>
+<p><img src="/images/efficiency/p5.png"></p>
 <p>刚开始的时候。因为把ChatGPT的代码复制过去后，就发现始终有一些没反应。然后几经折腾才发现在这里可以看到debug的信息。也就是</p>
-<p><img src="/images/efficiency/p6.png" alt="image.png"></p>
+<p><img src="/images/efficiency/p6.png"></p>
 <p>打开后就能看到这些了</p>
-<p><img src="/images/efficiency/p7.png" alt="image.png"></p>
+<p><img src="/images/efficiency/p7.png"></p>
 <p>后续发现是ChatGPT给出的事件不对。去查询后发现应该是使用 OnUpdated事件</p>
-<p><img src="/images/efficiency/p8.png" alt="image.png"></p>
+<p><img src="/images/efficiency/p8.png"></p>
 <p>接下来就是要去本地读取文件了。当浏览器输入地址栏时去匹配。 看到有其他Chrome插件能直接导出导入数据，但是我在Chrome的extends里确实没看到文件。有大佬知道Chrome插件的数据保存在哪里的可以方便告知一下。</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">chrome.<span class="property">runtime</span>.<span class="property">onMessage</span>.<span class="title function_">addListener</span>(<span class="keyword">function</span>(<span class="params">request, sender, sendResponse</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (request.<span class="property">action</span> === <span class="string">&#x27;checkURL&#x27;</span>) &#123;</span><br><span class="line">    <span class="title function_">checkURL</span>(request.<span class="property">url</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">chrome.<span class="property">tabs</span>.<span class="property">onUpdated</span>.<span class="title function_">addListener</span>(<span class="keyword">function</span>(<span class="params">tabId, changeInfo, tab</span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;onUpdated&#x27;</span>);</span><br><span class="line">  <span class="comment">// 当地址栏URL变化时执行处理逻辑</span></span><br><span class="line">  <span class="comment">// if (changeInfo.url) &#123;</span></span><br><span class="line">    <span class="title function_">checkURL</span>(changeInfo.<span class="property">url</span>);</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;地址栏URL变化：&#x27;</span>, changeInfo.<span class="property">url</span>);</span><br><span class="line">    <span class="comment">// 在此处进行其他操作</span></span><br><span class="line">  <span class="comment">// &#125;</span></span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">checkURL</span>(<span class="params">url</span>) &#123;</span><br><span class="line">  <span class="comment">// 获取扩展目录中的文件路径</span></span><br><span class="line">  <span class="keyword">var</span> fileUrl = chrome.<span class="property">runtime</span>.<span class="title function_">getURL</span>(<span class="string">&#x27;file.txt&#x27;</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 使用 fetch API 读取文件内容</span></span><br><span class="line">  <span class="title function_">fetch</span>(fileUrl)</span><br><span class="line">    .<span class="title function_">then</span>(<span class="function"><span class="params">response</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (!response.<span class="property">ok</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">`Failed to fetch file: <span class="subst">$&#123;response.status&#125;</span>`</span>);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> response.<span class="title function_">text</span>();</span><br><span class="line">    &#125;)</span><br><span class="line">    .<span class="title function_">then</span>(<span class="function"><span class="params">data</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="comment">// 成功获取文件内容</span></span><br><span class="line">      <span class="keyword">var</span> allowedURLs = data.<span class="title function_">split</span>(<span class="string">&#x27;\n&#x27;</span>).<span class="title function_">map</span>(<span class="function"><span class="params">url</span> =&gt;</span> url.<span class="title function_">trim</span>());</span><br><span class="line">      <span class="keyword">if</span> (allowedURLs.<span class="title function_">includes</span>(url)) &#123;</span><br><span class="line">        <span class="comment">// 如果地址在文件中，跳转到空白页</span></span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;URL is allowed. Redirecting to about:blank&quot;</span>);</span><br><span class="line">        chrome.<span class="property">tabs</span>.<span class="title function_">update</span>(&#123;<span class="attr">url</span>: <span class="string">&#x27;about:blank&#x27;</span>&#125;);</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;URL is not allowed. Redirecting to the original URL&quot;</span>);</span><br><span class="line">        <span class="comment">// 否则，正常访问</span></span><br><span class="line">        <span class="comment">// chrome.tabs.update(&#123;url: url&#125;);</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    .<span class="title function_">catch</span>(<span class="function"><span class="params">error</span> =&gt;</span> &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">&#x27;Failed to load file:&#x27;</span>, error);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -306,12 +304,12 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/bash</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Get the clipboard content</span></span><br><span class="line">clipboard_content=$(pbpaste)</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Specify the path and filename <span class="keyword">for</span> the output file</span></span><br><span class="line">output_file=&quot;xxxx/file.txt&quot;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Check <span class="keyword">if</span> the content contains <span class="string">&quot;http&quot;</span></span></span><br><span class="line">if [[ $clipboard_content == *http* ]]; then</span><br><span class="line">    # Check if the content already exists in the file</span><br><span class="line">    if grep -qF &quot;$clipboard_content&quot; &quot;$output_file&quot;; then</span><br><span class="line">        echo &quot;Content already exists. Not writing to the file.&quot;</span><br><span class="line">    else</span><br><span class="line">        # Append clipboard content to the specified file</span><br><span class="line">        echo &quot;$clipboard_content&quot; &gt;&gt; &quot;$output_file&quot;</span><br><span class="line">        echo &quot;Content written to the file.&quot;</span><br><span class="line">    fi</span><br><span class="line">else</span><br><span class="line">    echo &quot;Clipboard content does not contain &#x27;http&#x27;. Not writing to the file.&quot;</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
 
 <p>以上这是shell脚本的内容，为了防止误触碰，则判定如果复制的东西里有http的话，才会被写到文件里去。</p>
-<p><img src="/images/efficiency/p9.png" alt="image.png"></p>
+<p><img src="/images/efficiency/p9.png"></p>
 <p>但是后续发现这样并不太好使，所以改为从shell脚本里执行快捷键的命令<br>即添加 这两行即可</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">osascript -e &#x27;tell application &quot;System Events&quot; to keystroke &quot;l&quot; using &#123;command down&#125;&#x27;</span><br><span class="line">osascript -e &#x27;tell application &quot;System Events&quot; to keystroke &quot;c&quot; using &#123;command down&#125;&#x27;</span><br></pre></td></tr></table></figure>
 
 <p>所以最终就变成了这样的，只需要一个快捷键，就能实现这个功能了。</p>
-<p><img src="/images/efficiency/p10.png" alt="image.png"></p>
+<p><img src="/images/efficiency/p10.png"></p>
 <p>当然在这过程中并非也一直这么顺利，有一些类似于的错误，好在ChatGPT大部分也都能一一解决</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The error you&#x27;re encountering, &quot;ReferenceError: XMLHttpRequest is not defined,&quot; suggests that the XMLHttpRequest object is not available in the background script of your Chrome extension. This is because Chrome extensions use a content security policy that restricts the use of inline scripts, and XMLHttpRequest is not allowed in the background script directly.</span><br></pre></td></tr></table></figure>
 
