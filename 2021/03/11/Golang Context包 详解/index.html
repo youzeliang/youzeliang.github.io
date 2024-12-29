@@ -29,7 +29,7 @@
       switchTab();
       window.addEventListener('hashchange', switchTab, false);
   })();
-  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="梁友泽的博客" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">Home</a><a class="navbar-item" href="/archives">Archives</a><a class="navbar-item" href="/categories">Categories</a><a class="navbar-item" href="/tags">Tags</a><a class="navbar-item" href="/about">关于我</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2021-03-11T07:10:23.000Z" title="3/11/2021, 3:10:23 PM">2021-03-11</time>发表</span><span class="level-item"><time dateTime="2024-12-24T15:53:38.286Z" title="12/24/2024, 11:53:38 PM">2024-12-24</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/golang/">golang</a></span><span class="level-item">28 分钟读完 (大约4168个字)</span></div></div><h1 class="title is-3 is-size-4-mobile">Golang Context包 详解</h1><div class="content"><p>context 主要用来在 goroutine 之间传递上下文信息，包括：取消信号、超时时间、截止时间、k-v 等。</p>
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="梁友泽的博客" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">Archives</a><a class="navbar-item" href="/categories">Categories</a><a class="navbar-item" href="/tags">Tags</a><a class="navbar-item" href="/about">关于我</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2021-03-11T07:10:23.000Z" title="3/11/2021, 3:10:23 PM">2021-03-11</time>发表</span><span class="level-item"><time dateTime="2024-12-24T15:53:38.286Z" title="12/24/2024, 11:53:38 PM">2024-12-24</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/golang/">golang</a></span><span class="level-item">28 分钟读完 (大约4168个字)</span></div></div><h1 class="title is-3 is-size-4-mobile">Golang Context包 详解</h1><div class="content"><p>context 主要用来在 goroutine 之间传递上下文信息，包括：取消信号、超时时间、截止时间、k-v 等。</p>
 <p>context 用来解决 goroutine 之间<code>退出通知</code>、<code>元数据传递</code>的功能。   <span id="more"></span></p>
 <p>控制并发有两种经典的方式，一种是WaitGroup，另外一种就是Context</p>
 <p>Value函数并没有任何保证，编译器不会检查传进来的参数是否是合理。</p>
@@ -193,12 +193,12 @@
         static: false,
         position: "bottom-left",
         content: {
-          message: "Este sitio web utiliza cookies para mejorar su experiencia.",
-          dismiss: "¡Entendido!",
-          allow: "Permitir cookies",
-          deny: "Descenso",
-          link: "Aprende más",
-          policy: "Política de cookies",
+          message: "This website uses cookies to improve your experience.",
+          dismiss: "Got it!",
+          allow: "Allow cookies",
+          deny: "Decline",
+          link: "Learn more",
+          policy: "Cookie Policy",
           href: "https://www.cookiesandyou.com/",
         },
         palette: {

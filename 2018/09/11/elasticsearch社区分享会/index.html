@@ -29,7 +29,7 @@
       switchTab();
       window.addEventListener('hashchange', switchTab, false);
   })();
-  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="梁友泽的博客" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">Home</a><a class="navbar-item" href="/archives">Archives</a><a class="navbar-item" href="/categories">Categories</a><a class="navbar-item" href="/tags">Tags</a><a class="navbar-item" href="/about">关于我</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2018-09-11T06:10:23.000Z" title="9/11/2018, 2:10:23 PM">2018-09-11</time>发表</span><span class="level-item"><time dateTime="2024-12-24T15:53:38.287Z" title="12/24/2024, 11:53:38 PM">2024-12-24</time>更新</span><span class="level-item">8 分钟读完 (大约1191个字)</span></div></div><h1 class="title is-3 is-size-4-mobile">elasticsearch社区分享会</h1><div class="content"><p>在前段时间加班的时候错过了两场我想去的技术会，这次终于没落空了。大佬也多，涨了不少姿势。特此记录一下分享，由于全凭记忆叙述，可能就没啥顺序而言的还原出之前的收获。<span id="more"></span></p>
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="梁友泽的博客" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">Archives</a><a class="navbar-item" href="/categories">Categories</a><a class="navbar-item" href="/tags">Tags</a><a class="navbar-item" href="/about">关于我</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2018-09-11T06:10:23.000Z" title="9/11/2018, 2:10:23 PM">2018-09-11</time>发表</span><span class="level-item"><time dateTime="2024-12-24T15:53:38.287Z" title="12/24/2024, 11:53:38 PM">2024-12-24</time>更新</span><span class="level-item">8 分钟读完 (大约1191个字)</span></div></div><h1 class="title is-3 is-size-4-mobile">elasticsearch社区分享会</h1><div class="content"><p>在前段时间加班的时候错过了两场我想去的技术会，这次终于没落空了。大佬也多，涨了不少姿势。特此记录一下分享，由于全凭记忆叙述，可能就没啥顺序而言的还原出之前的收获。<span id="more"></span></p>
 <p><img src="https://note.youdao.com/yws/api/personal/file/3CFBA64276584119816743278039B622?method=download&shareKey=06ad0e7b5775a493beb87ce827d0cd6a"></p>
 <p>确实目前项目中目前涉及到了elasticsearch不多，索引都才几个。看到别人分享的都是2千，4-5千的索引量。而且数据量大的话才更能体现出elasticsearch的作用。</p>
 <p>周金阳  果壳网&#x2F;在行 算法工程师</p>
@@ -78,12 +78,12 @@
         static: false,
         position: "bottom-left",
         content: {
-          message: "Este sitio web utiliza cookies para mejorar su experiencia.",
-          dismiss: "¡Entendido!",
-          allow: "Permitir cookies",
-          deny: "Descenso",
-          link: "Aprende más",
-          policy: "Política de cookies",
+          message: "This website uses cookies to improve your experience.",
+          dismiss: "Got it!",
+          allow: "Allow cookies",
+          deny: "Decline",
+          link: "Learn more",
+          policy: "Cookie Policy",
           href: "https://www.cookiesandyou.com/",
         },
         palette: {
