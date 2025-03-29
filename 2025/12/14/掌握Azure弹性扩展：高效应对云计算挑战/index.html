@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>掌握Azure弹性扩展：高效应对云计算挑战 - 梁友泽的博客</title><link rel="manifest" href="/manifest.json"><meta name="application-name" content="梁友泽的博客"><meta name="msapplication-TileImage" content="/img/favicon.svg"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="梁友泽的博客"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="description" content="在云原生技术迅猛发展的数字化时代，高弹性架构已成为现代企业应对业务波动的核心能力。作为微软云生态的核心平台，Azure通过创新的弹性伸缩机制赋能企业实现智能化的资源调控，这一关键技术点更是Microsoft Azure基础认证（AZ-900）考核的重点内容。本文将围绕以下维度展开深度剖析：首先解析云计算弹性模型的技术本质，继而拆解Azure自动扩展集的运作机理，最后结合典型应用场景给出架构设计的最"><meta property="og:type" content="blog"><meta property="og:title" content="掌握Azure弹性扩展：高效应对云计算挑战"><meta property="og:url" content="https://www.liangyouze.com/2025/12/14/%E6%8E%8C%E6%8F%A1Azure%E5%BC%B9%E6%80%A7%E6%89%A9%E5%B1%95%EF%BC%9A%E9%AB%98%E6%95%88%E5%BA%94%E5%AF%B9%E4%BA%91%E8%AE%A1%E7%AE%97%E6%8C%91%E6%88%98/"><meta property="og:site_name" content="梁友泽的博客"><meta property="og:description" content="在云原生技术迅猛发展的数字化时代，高弹性架构已成为现代企业应对业务波动的核心能力。作为微软云生态的核心平台，Azure通过创新的弹性伸缩机制赋能企业实现智能化的资源调控，这一关键技术点更是Microsoft Azure基础认证（AZ-900）考核的重点内容。本文将围绕以下维度展开深度剖析：首先解析云计算弹性模型的技术本质，继而拆解Azure自动扩展集的运作机理，最后结合典型应用场景给出架构设计的最"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://www.liangyouze.com/img/og_image.png"><meta property="article:published_time" content="2025-12-14T14:10:23.000Z"><meta property="article:modified_time" content="2025-03-29T10:36:45.211Z"><meta property="article:author" content="梁友泽"><meta property="article:tag" content="azure"><meta property="twitter:card" content="summary"><meta property="twitter:image:src" content="https://www.liangyouze.com/img/og_image.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://www.liangyouze.com/2025/12/14/%E6%8E%8C%E6%8F%A1Azure%E5%BC%B9%E6%80%A7%E6%89%A9%E5%B1%95%EF%BC%9A%E9%AB%98%E6%95%88%E5%BA%94%E5%AF%B9%E4%BA%91%E8%AE%A1%E7%AE%97%E6%8C%91%E6%88%98/"},"headline":"掌握Azure弹性扩展：高效应对云计算挑战","image":["https://www.liangyouze.com/img/og_image.png"],"datePublished":"2025-12-14T14:10:23.000Z","dateModified":"2025-03-29T10:36:45.211Z","author":{"@type":"Person","name":"梁友泽"},"publisher":{"@type":"Organization","name":"梁友泽的博客","logo":{"@type":"ImageObject","url":"https://www.liangyouze.com/img/logo.svg"}},"description":"在云原生技术迅猛发展的数字化时代，高弹性架构已成为现代企业应对业务波动的核心能力。作为微软云生态的核心平台，Azure通过创新的弹性伸缩机制赋能企业实现智能化的资源调控，这一关键技术点更是Microsoft Azure基础认证（AZ-900）考核的重点内容。本文将围绕以下维度展开深度剖析：首先解析云计算弹性模型的技术本质，继而拆解Azure自动扩展集的运作机理，最后结合典型应用场景给出架构设计的最"}</script><link rel="canonical" href="https://www.liangyouze.com/2025/12/14/%E6%8E%8C%E6%8F%A1Azure%E5%BC%B9%E6%80%A7%E6%89%A9%E5%B1%95%EF%BC%9A%E9%AB%98%E6%95%88%E5%BA%94%E5%AF%B9%E4%BA%91%E8%AE%A1%E7%AE%97%E6%8C%91%E6%88%98/"><link rel="icon" href="/img/favicon.svg"><link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.0.0/css/all.css"><link data-pjax rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link data-pjax rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" defer></script><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.min.css"><!--!--><!--!--><!--!--><style>.pace{-webkit-pointer-events:none;pointer-events:none;-webkit-user-select:none;-moz-user-select:none;user-select:none}.pace-inactive{display:none}.pace .pace-progress{background:#3273dc;position:fixed;z-index:2000;top:0;right:100%;width:100%;height:2px}</style><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><!--!--><!--!--><!-- hexo injector head_end start --><script>
+  (function () {
+      function switchTab() {
+          if (!location.hash) {
+            return;
+          }
+
+          const id = '#' + CSS.escape(location.hash.substring(1));
+          const $tabMenu = document.querySelector(`.tabs a[href="${id}"]`);
+          if (!$tabMenu) {
+            return;
+          }
+
+          const $tabMenuContainer = $tabMenu.parentElement.parentElement;
+          Array.from($tabMenuContainer.children).forEach($menu => $menu.classList.remove('is-active'));
+          Array.from($tabMenuContainer.querySelectorAll('a'))
+              .map($menu => document.getElementById($menu.getAttribute("href").substring(1)))
+              .forEach($content => $content.classList.add('is-hidden'));
+
+          if ($tabMenu) {
+              $tabMenu.parentElement.classList.add('is-active');
+          }
+          const $activeTab = document.querySelector(id);
+          if ($activeTab) {
+              $activeTab.classList.remove('is-hidden');
+          }
+      }
+      switchTab();
+      window.addEventListener('hashchange', switchTab, false);
+  })();
+  </script><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body class="is-2-column"><nav class="navbar navbar-main"><div class="container navbar-container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/"><img src="/img/logo.svg" alt="梁友泽的博客" height="28"></a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">主页</a><a class="navbar-item" href="/archives">归档</a><a class="navbar-item" href="/categories">分类</a><a class="navbar-item" href="/tags">标签</a><a class="navbar-item" href="/about">关于我</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="Download on GitHub" href="https://github.com/ppoffice/hexo-theme-icarus"><i class="fab fa-github"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-8-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2025-12-14T14:10:23.000Z" title="12/14/2025, 10:10:23 PM">2025-12-14</time>发表</span><span class="level-item"><time dateTime="2025-03-29T10:36:45.211Z" title="3/29/2025, 6:36:45 PM">2025-03-29</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/azure/">azure</a></span><span class="level-item">25 分钟读完 (大约3759个字)</span><span class="level-item" id="busuanzi_container_page_pv"><span id="busuanzi_value_page_pv">0</span>次访问</span></div></div><h1 class="title is-3 is-size-4-mobile">掌握Azure弹性扩展：高效应对云计算挑战</h1><div class="content"><p>在云原生技术迅猛发展的数字化时代，高弹性架构已成为现代企业应对业务波动的核心能力。作为微软云生态的核心平台，Azure通过创新的弹性伸缩机制赋能企业实现智能化的资源调控，这一关键技术点更是Microsoft Azure基础认证（AZ-900）考核的重点内容。本文将围绕以下维度展开深度剖析：首先解析云计算弹性模型的技术本质，继而拆解Azure自动扩展集的运作机理，最后结合典型应用场景给出架构设计的最佳实践，为即将参加AZ-900认证的专业人士构建系统化的知识框架。</p>
+<span id="more"></span>
+
+
+<h3 id="1a45792e">什么是高弹性？</h3>
+云计算中的弹性概念解析与应用实践
+
+<p>一、高弹性的核心内涵<br>高弹性是云计算体系的核心特征之一，特指系统基于实时负载变化自动调节资源配置的能力。该能力表现为双向动态调节机制：当负载激增时，系统可智能实现资源扩容（Scale Out）；当负载回落时，又能自动执行资源回收（Scale In）。这种动态平衡机制使企业能够有效应对业务流量的峰谷波动，在保障服务性能的同时实现资源利用率最大化。</p>
+<p>二、弹性与扩展性的概念辨析</p>
+<ol>
+<li>高弹性体系特征</li>
+</ol>
+<ul>
+<li>双向动态调节：具备自动扩缩容的闭环控制能力</li>
+<li>实时响应机制：基于预设策略或AI算法进行秒级资源调度</li>
+<li>成本效能优化：通过资源动态回收降低闲置成本</li>
+<li>全周期管理：覆盖资源部署、监控、调整的全流程自动化</li>
+</ul>
+<ol>
+<li>高扩展性体系特征</li>
+</ol>
+<ul>
+<li>架构可延展性：支持通过增加节点提升系统容量</li>
+<li>线性扩展能力：保持性能与资源增长的线性关系</li>
+<li>容量规划导向：更侧重资源供给的纵向延伸潜力</li>
+<li>手动干预依赖：通常需要人工决策进行扩展操作</li>
+</ul>
+<p>关键差异点：弹性系统强调自动化实时调控，而扩展性侧重架构的可扩展潜力。</p>
+<p>三、弹性扩展的实现机制</p>
+<ol>
+<li>水平扩展架构（首选方案）<br>（1）扩容机制(Scale Out)</li>
+</ol>
+<ul>
+<li>动态实例部署：根据负载指标自动启动新VM实例</li>
+<li>负载均衡分发：通过流量调度器实现请求均匀分配</li>
+<li>无状态设计：基于微服务架构实现实例快速扩展</li>
+</ul>
+<p>（2）缩容机制(Scale In)</p>
+<ul>
+<li>智能回收策略：依据负载下降趋势自动关闭冗余实例</li>
+<li>优雅下线机制：确保业务流量完全迁移后执行回收</li>
+<li>资源池化管理：回收实例自动返回资源池待用</li>
+</ul>
+<p>核心优势：  </p>
+<ul>
+<li>业务连续性保障：扩展过程实现零停机</li>
+<li>成本节约：资源使用量与业务需求精确匹配</li>
+<li>故障容错能力：多实例架构天然具备冗余特性</li>
+<li>无限扩展潜力：突破单节点硬件限制</li>
+</ul>
+<ol>
+<li>垂直扩展的局限性<br>（1）实施风险</li>
+</ol>
+<ul>
+<li>服务中断：升级过程需停机维护</li>
+<li>数据完整性风险：硬件更换可能引发数据丢失</li>
+<li>兼容性挑战：新硬件与现有系统可能存在适配问题</li>
+</ul>
+<p>（2）发展瓶颈</p>
+<ul>
+<li>物理天花板：受限于单机最大硬件配置</li>
+<li>成本曲线陡升：高端硬件采购成本呈指数增长</li>
+<li>资源浪费：高峰配置在低负载期利用率低下</li>
+</ul>
+<p>（3）运维复杂度</p>
+<ul>
+<li>人工干预需求：每次扩展需运维团队直接操作</li>
+<li>技术债务累积：硬件异构性增加系统管理复杂度</li>
+<li>升级周期长：从采购到部署耗时数周至数月</li>
+</ul>
+<p>四、云平台最佳实践<br>主流云服务商（如Azure）普遍采用智能弹性扩展方案：</p>
+<ol>
+<li>预测性扩展：基于机器学习预判流量趋势</li>
+<li>指标驱动：根据CPU、内存、队列深度等阈值触发动作</li>
+<li>混合策略：结合定时策略与动态响应机制</li>
+<li>渐进式扩展：采用蓝绿部署保证业务平稳</li>
+</ol>
+<p>通过构建智能弹性架构，企业可将资源利用率提升40-60%，同时将运维成本降低30-50%，真正实现云计算”按需付费”的价值主张。</p>
+<p><font style="color:rgb(77, 77, 77);">因此，对于大多数云计算应用来说，水平扩展是实现高弹性更为理想的方式。</font></p>
+<p><font style="color:rgb(77, 77, 77);"></font></p>
+<p>Azure平台为现代企业提供了一整套智能弹性扩展解决方案，通过自动化资源调控帮助用户在不提升运维复杂度的情况下实现业务敏捷响应。以下是两大核心服务的优化呈现：</p>
+<ol>
+<li><strong>智能弹性计算集群（VM Scale Sets）</strong><br>作为Azure基础设施自动化的核心组件，该服务重构了传统虚拟机的管理模式，构建可编程的计算资源池：</li>
+</ol>
+<ul>
+<li>动态容量感知系统：基于实时指标（CPU&#x2F;内存&#x2F;网络流量）构建预测模型，实现秒级资源伸缩决策，响应效率提升60%以上</li>
+<li>多维度扩展策略：支持时间驱动型（定时任务）、指标驱动型（性能阈值）和混合模式三种弹性方案</li>
+<li>智能调度引擎：结合Azure负载均衡器与健康探针，实现流量智能分发与故障节点自动替换，保障服务SLA</li>
+<li>零接触运维：从虚拟机映像标准化到滚动升级机制，全生命周期管理无需人工干预</li>
+</ul>
+<ol start="2">
+<li><strong>云原生数据库弹性方案（SQL Database弹性池）</strong><br>重新定义关系型数据库的云化部署模式，突破传统架构的扩展瓶颈：</li>
+</ol>
+<ul>
+<li>自适应资源池化技术：通过eDTU（弹性数据库事务单元）共享架构，实现百级数据库实例的算力动态调配</li>
+<li>智能分层存储：内置机器学习引擎自动识别热&#x2F;温&#x2F;冷数据，结合Premium SSD&#x2F;Standard HDD分层存储策略，存储成本最高可优化40%</li>
+<li>无缝混合云连接：通过Azure Hybrid Benefit实现本地SQL Server与云数据库的协议兼容，支持跨云灾备与读写分离架构</li>
+<li>弹性事务处理：突破单库资源限制，在突发流量场景下自动提升事务处理容量，峰值承载能力可达基础配置的8倍</li>
+</ul>
+<p><font style="color:rgb(77, 77, 77);"></font></p>
+<h3 id="0a5fb351"><font style="color:rgb(79, 79, 79);">实施高弹性的最佳实践</font></h3>
+
+
+<p>为实现真正的高弹性架构，企业需将Azure原生能力与体系化的扩展策略深度融合。以下核心实践框架可确保弹性机制的技术效能与经济效益双维度优化：</p>
+<p>【智能监控体系】<br>构建覆盖全栈的监控拓扑，实现：<br>• 多维度指标联动分析：整合CPU&#x2F;内存&#x2F;IOPs等基础指标与QPS&#x2F;错误率等业务指标，建立动态权重模型<br>• 预测性预警机制：采用时间序列分析算法，基于历史数据生成弹性容量预测基线<br>• 分级响应策略：划分P0-P3四级告警阈值，关联不同级别的弹性扩缩预案</p>
+<p>【弹性决策引擎】<br>设计具备自学习能力的自动化中枢：</p>
+<ol>
+<li>动态规则引擎</li>
+</ol>
+<ul>
+<li>部署基于ARIMA模型的流量预测组件</li>
+<li>实施渐进式扩缩容策略，设置可调谐的冷却周期（建议30-600秒动态范围）</li>
+<li>引入熔断机制，当异常波动超过3σ时触发人工复核</li>
+</ul>
+<ol start="2">
+<li>资源编排层</li>
+</ol>
+<ul>
+<li>实现跨可用区资源调度，预设区域故障转移策略</li>
+<li>构建虚拟机规模集与容器服务的混合编排架构</li>
+<li>配置基于优先级的分批部署机制</li>
+</ul>
+<p>【成本治理模型】<br>建立弹性与成本的动态平衡方程：<br>• 混合计费优化：通过预留实例覆盖基线负载(60-70%)，突发流量采用Spot实例承接<br>• 资源画像系统：对工作负载进行类型标记（稳态&#x2F;突发&#x2F;可变），实施差异化伸缩策略<br>• 效益评估矩阵：定期生成弹性效能报告，量化资源节省率与业务连续性提升指标</p>
+<p>该实践框架通过构建感知-决策-执行的三层弹性治理体系，使系统在保持业务连续性的同时，实现资源利用率提升40%以上。建议企业结合混沌工程定期验证弹性边界，持续优化弹性策略的响应精度。</p>
+<h3 id="fcaf6144"><font style="color:rgb(79, 79, 79);">弹性架构设计考虑因素</font></h3>
+
+
+<p><font style="color:rgb(77, 77, 77);">为了确保高弹性的成功实施，企业在设计架构时需要考虑多个因素：</font></p>
+<p>应用程序架构设计<br>为实现系统弹性伸缩能力，建议采用以下核心设计原则：</p>
+<ol>
+<li>无状态服务架构<br>采用微服务架构模式构建无状态服务层，通过服务实例的去中心化设计确保任意节点均可独立处理业务请求。重要会话数据应通过分布式会话存储（如Redis Cluster）进行统一管理，避免服务实例本地状态影响横向扩容能力。</li>
+<li>分布式数据治理<br>构建多维度数据访问体系，结合ShardingSphere等数据库中间件实现读写分离与分库分表策略。采用分级缓存机制（本地缓存+分布式缓存），通过缓存穿透保护和数据预热策略保障高并发场景下的数据访问性能，将单点查询压力降低68%以上。</li>
+</ol>
+<p><strong>智能负载均衡机制</strong><br>构建四层&#x2F;七层混合负载均衡体系时，需重点关注以下三个维度：</p>
+<p>• 动态流量调度：基于实时节点性能指标（CPU&#x2F;RAM&#x2F;负载）实施自适应权重调整，配合最小连接数算法实现请求流量在服务实例间的智能调度。引入一致性哈希算法保障长连接类业务（如WebSocket）的会话粘性，维持业务连续性。</p>
+<p>• 健康监测体系：建立多维度健康检查机制（TCP心跳检测+HTTP语义检查+自定义业务状态验证），对异常节点实施自动隔离熔断，确保服务池可用性不低于99.95%。</p>
+<p>• 会话连续性保障：针对有状态业务场景，通过会话令牌绑定与负载均衡器联动机制，在保持横向扩展能力的同时，实现用户会话信息的无损迁移，保障关键业务流程完整性。</p>
+<p><font style="color:rgb(77, 77, 77);"></font></p>
+<h3 id="0081ff2d"><font style="color:rgb(79, 79, 79);">常见挑战与解决方案</font></h3>
+
+
+<p><strong>一、系统性能优化策略</strong><br>在Azure云环境运行过程中，尽管平台具备弹性扩展能力，仍需注意以下性能优化要点：</p>
+<ol>
+<li>性能瓶颈诊断<br>通过Azure Monitor等原生监控工具进行实时性能分析，准确定位系统瓶颈。建议采用Application Insights进行代码级性能追踪，结合Log Analytics开展多维度的日志分析，快速识别I&#x2F;O延迟、CPU过载或内存泄漏等关键问题。</li>
+<li>应用架构优化<br>针对诊断结果实施代码级优化，重点改进数据库查询效率（包括索引优化和查询缓存），优化API响应时间，并引入异步处理机制。推荐使用Profiler工具进行热点代码分析，同时考虑采用Redis缓存提升数据访问性能。</li>
+<li>资源配置调优<br>基于工作负载特征进行资源配置的动态调整，建议：<br>• 实施自动缩放策略匹配流量波动<br>• 对计算资源进行垂直&#x2F;水平扩展组合优化<br>• 使用Premium SSD托管磁盘提升I&#x2F;O性能<br>• 配置负载均衡实现流量智能分配</li>
+</ol>
+<p><strong>二、成本管控实施方案</strong></p>
+<p>在保障系统弹性的同时，建议通过以下措施实现成本精细化管理：</p>
+<ol>
+<li>预算智能管控<br>• 配置Azure Cost Management预算预警机制，设置多级消费阈值提醒<br>• 建立部门&#x2F;项目级成本分摊模型<br>• 启用成本异常检测功能，自动识别非常规支出</li>
+<li>资源效能优化<br>• 定期执行资源利用率分析报告，识别闲置资源<br>• 采用预留实例实现长期工作负载的成本节约<br>• 实施自动启停策略优化开发测试环境使用<br>• 运用Azure Advisor获取个性化优化建议</li>
+<li>持续优化机制<br>建立成本审查制度，每月进行费用结构分析，重点优化：<br>• 存储层的生命周期管理策略<br>• 网络流量的区域化优化<br>• 服务层级选择的经济性评估<br>• 容器化改造带来的资源利用提升</li>
+</ol>
+<p><strong><font style="color:rgb(77, 77, 77);">常见问题解答（FAQ）</font></strong></p>
+<p><strong><font style="color:rgb(77, 77, 77);">Q1: 高弹性和高可用性有什么区别？</font></strong><font style="color:rgb(77, 77, 77);"><br></font><font style="color:rgb(77, 77, 77);">A: 高弹性关注资源的自动伸缩能力，而高可用性主要确保服务的持续运行。</font></p>
+<p><strong><font style="color:rgb(77, 77, 77);">Q2: 实现高弹性需要多少成本？</font></strong><font style="color:rgb(77, 77, 77);"><br></font><font style="color:rgb(77, 77, 77);">A: 成本取决于具体实施方案，但通常可以通过优化配置来控制支出。</font></p>
+<p><strong><font style="color:rgb(77, 77, 77);">Q3: 小型企业是否需要高弹性？</font></strong><font style="color:rgb(77, 77, 77);"><br></font><font style="color:rgb(77, 77, 77);">A: 即使是小型企业也能从高弹性中受益，特别是在处理不稳定工作负载时。</font></p>
+<p><strong><font style="color:rgb(77, 77, 77);">Q4: 如何选择合适的扩展策略？</font></strong><font style="color:rgb(77, 77, 77);"><br></font><font style="color:rgb(77, 77, 77);">A: 需要根据应用特性、预算和性能需求来选择合适的扩展策略。</font></p>
+<p><strong><font style="color:rgb(77, 77, 77);">Q5: 高弹性会影响应用程序性能吗？</font></strong><font style="color:rgb(77, 77, 77);"><br></font><font style="color:rgb(77, 77, 77);">A: 合理配置的高弹性方案通常会提升而不是影响性能。</font></p>
+</div><div class="article-licensing box"><div class="licensing-title"><p>掌握Azure弹性扩展：高效应对云计算挑战</p><p><a href="https://www.liangyouze.com/2025/12/14/掌握Azure弹性扩展：高效应对云计算挑战/">https://www.liangyouze.com/2025/12/14/掌握Azure弹性扩展：高效应对云计算挑战/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>梁友泽</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2025-12-14</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2025-03-29</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icons" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="icon fab fa-creative-commons"></i></a><a class="icons" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="icon fab fa-creative-commons-by"></i></a><a class="icons" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="icon fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="article-tags is-size-7 mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/tags/azure/">azure</a></div><!--!--></article></div><div class="card"><div class="card-content"><h3 class="menu-label has-text-centered">喜欢这篇文章？打赏一下作者吧</h3><div class="buttons is-centered"><a class="button donate" data-type="alipay"><span class="icon is-small"><i class="fab fa-alipay"></i></span><span>支付宝</span><span class="qrcode"><img src="/img/images/qrcode/Alipay.jpeg" alt="支付宝"></span></a><a class="button donate" data-type="wechat"><span class="icon is-small"><i class="fab fa-weixin"></i></span><span>微信</span><span class="qrcode"><img src="/img/images/qrcode/WeChat.jpeg" alt="微信"></span></a></div></div></div><nav class="post-navigation mt-4 level is-mobile"><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2025/11/24/%E4%BB%A5%E7%BC%96%E7%A8%8B%E6%96%B9%E5%BC%8F%E8%AE%BE%E7%BD%AE%E5%92%8C%E8%BF%90%E8%A1%8C%20Azure%20Prompt%20Flow/"><span class="level-item">以编程方式设置和运行 Azure Prompt Flow</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><!--!--></div><div class="column column-left is-4-tablet is-4-desktop is-4-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar" src="/img/avatar.png" alt="梁友泽"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">梁友泽</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>北京</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives/"><p class="title">45</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories/"><p class="title">18</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags/"><p class="title">20</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/youzeliang" target="_blank" rel="me noopener">关注我</a></div><div class="level is-mobile is-multiline"><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="Github" href="https://github.com/youzeliang"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="me noopener" title="RSS" href="/"><i class="fas fa-rss"></i></a></div></div></div><!--!--><div class="card widget" data-type="links"><div class="card-content"><div class="menu"><h3 class="menu-label">链接</h3><ul class="menu-list"><li><a class="level is-mobile" href="https://www.liangyongrui.com" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">梁永锐</span></span><span class="level-right"><span class="level-item tag">www.liangyongrui.com</span></span></a></li></ul></div></div></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/MySQL/"><span class="level-start"><span class="level-item">MySQL</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li><li><a class="level is-mobile" href="/categories/Python/"><span class="level-start"><span class="level-item">Python</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/azure/"><span class="level-start"><span class="level-item">azure</span></span><span class="level-end"><span class="level-item tag">10</span></span></a></li><li><a class="level is-mobile" href="/categories/docker/"><span class="level-start"><span class="level-item">docker</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/gin/"><span class="level-start"><span class="level-item">gin</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/golang/"><span class="level-start"><span class="level-item">golang</span></span><span class="level-end"><span class="level-item tag">5</span></span></a></li><li><a class="level is-mobile" href="/categories/kafka/"><span class="level-start"><span class="level-item">kafka</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/map/"><span class="level-start"><span class="level-item">map</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/mysql/"><span class="level-start"><span class="level-item">mysql</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/panic/"><span class="level-start"><span class="level-item">panic</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/string/"><span class="level-start"><span class="level-item">string</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/vim/"><span class="level-start"><span class="level-item">vim</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%86%85%E5%AD%98%E9%80%83%E9%80%B8/"><span class="level-start"><span class="level-item">内存逃逸</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%87%BD%E6%95%B0/"><span class="level-start"><span class="level-item">函数</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%8F%8D%E5%B0%84/"><span class="level-start"><span class="level-item">反射</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E6%95%88%E7%8E%87/"><span class="level-start"><span class="level-item">效率</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E6%9D%82%E8%B0%88/"><span class="level-start"><span class="level-item">杂谈</span></span><span class="level-end"><span class="level-item tag">4</span></span></a></li><li><a class="level is-mobile" href="/categories/%E8%A7%84%E8%8C%83/"><span class="level-start"><span class="level-item">规范</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2025-12-14T14:10:23.000Z">2025-12-14</time></p><p class="title"><a href="/2025/12/14/%E6%8E%8C%E6%8F%A1Azure%E5%BC%B9%E6%80%A7%E6%89%A9%E5%B1%95%EF%BC%9A%E9%AB%98%E6%95%88%E5%BA%94%E5%AF%B9%E4%BA%91%E8%AE%A1%E7%AE%97%E6%8C%91%E6%88%98/">掌握Azure弹性扩展：高效应对云计算挑战</a></p><p class="categories"><a href="/categories/azure/">azure</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2025-11-24T13:10:23.000Z">2025-11-24</time></p><p class="title"><a href="/2025/11/24/%E4%BB%A5%E7%BC%96%E7%A8%8B%E6%96%B9%E5%BC%8F%E8%AE%BE%E7%BD%AE%E5%92%8C%E8%BF%90%E8%A1%8C%20Azure%20Prompt%20Flow/">以编程方式设置和运行 Azure Prompt Flow</a></p><p class="categories"><a href="/categories/azure/">azure</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2025-03-20T13:10:23.000Z">2025-03-20</time></p><p class="title"><a href="/2025/03/20/AI%E9%A9%B1%E5%8A%A8%E7%9A%84%E7%BC%96%E8%AF%91%E5%99%A8%E4%BC%98%E5%8C%96%EF%BC%9AAzure%E4%B8%8ELLVM%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8C%96%E4%BB%A3%E7%A0%81%E5%8A%A0%E9%80%9F%E6%96%B9%E6%A1%88/">AI驱动的编译器优化：Azure与LLVM的自动化代码加速方案</a></p><p class="categories"><a href="/categories/azure/">azure</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2025-03-15T13:10:23.000Z">2025-03-15</time></p><p class="title"><a href="/2025/03/15/Blackwell%20Ultra%20GPU%E5%9C%A8Azure%20AI%E4%B8%AD%E7%9A%84%E6%9C%AA%E6%9D%A5%E5%B1%95%E6%9C%9B%EF%BC%9A%E4%B8%87%E4%BA%BF%E5%8F%82%E6%95%B0%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83/">Blackwell Ultra GPU在Azure AI中的未来展望：万亿参数模型训练</a></p><p class="categories"><a href="/categories/azure/">azure</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2025-02-19T13:10:23.000Z">2025-02-19</time></p><p class="title"><a href="/2025/02/19/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E9%AB%98%E5%8F%AF%E6%89%A9%E5%B1%95%E6%80%A7%E5%8F%8A%E5%85%B6%E5%9C%A8%20Azure%20%E4%B8%AD%E7%9A%84%E5%AE%9E%E7%8E%B0/">深入理解高可扩展性及其在 Azure 中的实现</a></p><p class="categories"><a href="/categories/azure/">azure</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2025/12/"><span class="level-start"><span class="level-item">十二月 2025</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2025/11/"><span class="level-start"><span class="level-item">十一月 2025</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2025/03/"><span class="level-start"><span class="level-item">三月 2025</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/archives/2025/02/"><span class="level-start"><span class="level-item">二月 2025</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/archives/2025/01/"><span class="level-start"><span class="level-item">一月 2025</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li><li><a class="level is-mobile" href="/archives/2024/12/"><span class="level-start"><span class="level-item">十二月 2024</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/archives/2023/11/"><span class="level-start"><span class="level-item">十一月 2023</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2023/05/"><span class="level-start"><span class="level-item">五月 2023</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2022/06/"><span class="level-start"><span class="level-item">六月 2022</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2022/05/"><span class="level-start"><span class="level-item">五月 2022</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2022/04/"><span class="level-start"><span class="level-item">四月 2022</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2021/09/"><span class="level-start"><span class="level-item">九月 2021</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2021/03/"><span class="level-start"><span class="level-item">三月 2021</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2021/01/"><span class="level-start"><span class="level-item">一月 2021</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2020/10/"><span class="level-start"><span class="level-item">十月 2020</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2020/08/"><span class="level-start"><span class="level-item">八月 2020</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2020/07/"><span class="level-start"><span class="level-item">七月 2020</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2020/04/"><span class="level-start"><span class="level-item">四月 2020</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2020/02/"><span class="level-start"><span class="level-item">二月 2020</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2020/01/"><span class="level-start"><span class="level-item">一月 2020</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2019/12/"><span class="level-start"><span class="level-item">十二月 2019</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2019/10/"><span class="level-start"><span class="level-item">十月 2019</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2019/09/"><span class="level-start"><span class="level-item">九月 2019</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2019/07/"><span class="level-start"><span class="level-item">七月 2019</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2019/06/"><span class="level-start"><span class="level-item">六月 2019</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/archives/2019/03/"><span class="level-start"><span class="level-item">三月 2019</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/archives/2019/02/"><span class="level-start"><span class="level-item">二月 2019</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2019/01/"><span class="level-start"><span class="level-item">一月 2019</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/archives/2018/12/"><span class="level-start"><span class="level-item">十二月 2018</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2018/10/"><span class="level-start"><span class="level-item">十月 2018</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2018/09/"><span class="level-start"><span class="level-item">九月 2018</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2018/08/"><span class="level-start"><span class="level-item">八月 2018</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2018/07/"><span class="level-start"><span class="level-item">七月 2018</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2018/05/"><span class="level-start"><span class="level-item">五月 2018</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2018/04/"><span class="level-start"><span class="level-item">四月 2018</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2018/03/"><span class="level-start"><span class="level-item">三月 2018</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/archives/2017/11/"><span class="level-start"><span class="level-item">十一月 2017</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/Docker/"><span class="tag">Docker</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/MySQL/"><span class="tag">MySQL</span><span class="tag">5</span></a></div><div class="control"><a class="tags has-addons" href="/tags/Python/"><span class="tag">Python</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/azure/"><span class="tag">azure</span><span class="tag">10</span></a></div><div class="control"><a class="tags has-addons" href="/tags/context/"><span class="tag">context</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/elasticsearch/"><span class="tag">elasticsearch</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/go/"><span class="tag">go</span><span class="tag">9</span></a></div><div class="control"><a class="tags has-addons" href="/tags/golang/"><span class="tag">golang</span><span class="tag">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/iframe/"><span class="tag">iframe</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/kafka/"><span class="tag">kafka</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/vim/"><span class="tag">vim</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E4%B8%AA%E4%BA%BA/"><span class="tag">个人</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/"><span class="tag">内存对齐</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/"><span class="tag">字符串</span><span class="tag">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%9D%82%E8%B0%88/"><span class="tag">杂谈</span><span class="tag">4</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%B4%A2%E5%BC%95/"><span class="tag">索引</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E8%A7%84%E5%88%99/"><span class="tag">规则</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E8%AE%A2%E5%8D%95%E5%8F%B7/"><span class="tag">订单号</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E8%AF%BB%E4%B9%A6/"><span class="tag">读书</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E8%B7%A8%E5%9F%9F/"><span class="tag">跨域</span><span class="tag">1</span></a></div></div></div></div></div></div><!--!--></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/"><img src="/img/logo.svg" alt="梁友泽的博客" height="28"></a><p class="is-size-7"><span>&copy; 2025 梁友泽</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a><br><span id="busuanzi_container_site_uv">共<span id="busuanzi_value_site_uv">0</span>个访客</span></p></div><div class="level-end"></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script><script>moment.locale("zh-cn");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script data-pjax src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script data-pjax src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/cookieconsent@3.1.1/build/cookieconsent.min.js" defer></script><script>window.addEventListener("load", () => {
+      window.cookieconsent.initialise({
+        type: "info",
+        theme: "edgeless",
+        static: false,
+        position: "bottom-left",
+        content: {
+          message: "This website uses cookies to improve your experience.",
+          dismiss: "Got it!",
+          allow: "Allow cookies",
+          deny: "Decline",
+          link: "Learn more",
+          policy: "Cookie Policy",
+          href: "https://www.cookiesandyou.com/",
+        },
+        palette: {
+          popup: {
+            background: "#edeff5",
+            text: "#838391"
+          },
+          button: {
+            background: "#4b81e8"
+          },
+        },
+      });
+    });</script><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.10.0/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js"></script><script src="/js/pjax.js"></script><!--!--><!--!--><!--!--><script data-pjax src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script data-pjax src="/js/insight.js" defer></script><script data-pjax>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script></body></html>
